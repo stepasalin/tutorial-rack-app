@@ -10,6 +10,7 @@ GEM
     rackup (0.2.2)
       rack (>= 3.0.0.beta1)
       webrick
+    redis (4.7.1)
     webrick (1.7.0)
 
 PLATFORMS
@@ -19,6 +20,7 @@ DEPENDENCIES
   pry
   rack (= 3.0.0.beta1)
   rackup (~> 0.2.2)
+  redis (~> 4.7)
 
 RUBY VERSION
    ruby 2.7.4p191
