@@ -3,18 +3,24 @@
 require 'redis'
 require 'json'
 require_relative '../helpers/redis_helper'
+require_relative '../models/user'
 
 class UserController
   def new_user(req)
-    user = JSON.parse(req.body, object_class: User)
-    save_result = user.save
-    [201, {}, [save_result]]
-  rescue JSON::ParseError
-    [500, {}, ['internal server error']]
-  rescue UnprocessableUserError
-    [422, {}, user.validation_errors]
-  rescue UserNameAlreadyTakenError
-    [409, {}, ['user name already taken']]
+    user = nil
+    begin
+      json = JSON.parse req.body.read
+      user = User.json_create json
+      save_result = user.save
+      [201, {}, [save_result]]
+    rescue UnprocessableUserError
+      [422, {}, [user.validation_errors.to_s]]
+    rescue UserNameAlreadyTakenError
+      [409, {}, ['user name already taken']]
+    rescue Exception => e
+      puts e.full_message
+      [500, {}, ['internal server error']]
+    end
   end
 
   def find_user(req)

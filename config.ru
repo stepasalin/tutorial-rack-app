@@ -5,7 +5,6 @@ require_relative 'helpers/router'
 
 run do |env|
   req = Rack::Request.new(env)
-  req.body
   Router.new(req).handle
 end
 

@@ -1,3 +1,11 @@
+GIT
+  remote: https://gitlab.com/taxdome/forks/rubocop-taxdome.git
+  revision: c0f1e8dd8baad3b0f4fedff80b3dba16751269be
+  branch: main
+  specs:
+    rubocop-taxdome (0.1.0)
+      rubocop
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -42,6 +50,7 @@ DEPENDENCIES
   rackup (~> 0.2.2)
   redis (~> 4.7)
   rubocop
+  rubocop-taxdome!
 
 RUBY VERSION
    ruby 2.7.4p191
