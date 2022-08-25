@@ -48,7 +48,8 @@ class User
   # fixme?
   def self.find_by_name(name)
     json = REDIS_CONNECTION.get(name)
-    return nil if json.nil?
+    return nil if json.nil? # not found error?
+
     User.json_create(json)
   end
 

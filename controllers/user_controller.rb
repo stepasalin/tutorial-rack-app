@@ -17,7 +17,7 @@ class UserController
       [422, {}, [user.validation_errors.to_s]]
     rescue UserNameAlreadyTakenError
       [409, {}, ['user name already taken']]
-    rescue Exception => e
+    rescue StandardError => e
       puts e.full_message
       [500, {}, ['internal server error']]
     end
