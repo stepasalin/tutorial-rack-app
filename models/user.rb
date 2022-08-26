@@ -13,16 +13,16 @@ class User
 
   def initialize(name, gender, age)
     @name = name
-    @gender = gender
+    @gender = gender.to_sym
     @age = age
     valid?
   end
 
   def valid?
     @validation_errors = []
-    @validation_errors << 'name length must be between 1 and 30' unless @name&.length&.between? 1, 30
-    @validation_errors << 'unknown gender' unless GENDERS.include? @gender.to_sym
-    @validation_errors << 'age must be positive' unless @age&.positive?
+    name_valid?
+    gender_valid?
+    age_valid?
     @validation_errors.empty?
   end
 
@@ -47,13 +47,35 @@ class User
 
   # fixme?
   def self.find_by_name(name)
-    json = REDIS_CONNECTION.get(name)
+    raw = REDIS_CONNECTION.get(name)
+    return nil if raw.nil? # not found error?
+
+    json = JSON.parse(raw)
     return nil if json.nil? # not found error?
 
     User.json_create(json)
   end
 
   def self.json_create(json)
-    new(json['name'], json['gender'], json['age'])
+    puts json
+    new(json['name'], json['gender'], json['age'].to_i)
+  end
+
+  private
+
+  def age_valid?
+    @validation_errors << "age must be positive, actual = #{@age}" unless @age&.positive?
+  end
+
+  def gender_valid?
+    unless GENDERS.include?(@gender)
+      @validation_errors << "unknown gender, accepted = #{GENDERS.map(&:to_s)}, actual = #{@gender}"
+    end
+  end
+
+  def name_valid?
+    unless @name&.length&.between?(1, 30)
+      @validation_errors << "name length must be between 1 and 30, actual = #{@name&.length}"
+    end
   end
 end

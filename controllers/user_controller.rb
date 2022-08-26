@@ -4,6 +4,7 @@ require 'redis'
 require 'json'
 require_relative '../helpers/redis_helper'
 require_relative '../models/user'
+require_relative '../views/user_view'
 
 class UserController
   def new_user(req)
@@ -26,8 +27,6 @@ class UserController
   def find_user(req)
     name = req.path.gsub('/user/', '')
     user = User.find_by_name name
-    # todo to view
-    [404, {}, ['user not found']] if user.nil?
-    [200, {}, [user.to_json]]
+    UserView.new(user).render
   end
 end
