@@ -1,4 +1,6 @@
-require_relative '../controllers/user_controller'
+# frozen_string_literal: true
+
+require_relative '../controllers/user'
 
 class Router
   def initialize(req)

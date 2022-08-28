@@ -2,9 +2,9 @@
 
 require 'redis'
 require 'json'
-require_relative '../helpers/redis_helper'
+require_relative '../helpers/redis'
 require_relative '../models/user'
-require_relative '../views/user_view'
+require_relative '../views/user'
 
 class UserController
   def new_user(req)
@@ -20,13 +20,23 @@ class UserController
       [409, {}, ['user name already taken']]
     rescue StandardError => e
       puts e.full_message
-      [500, {}, ['internal server error']]
+      internal_server_error
     end
   end
 
   def find_user(req)
     name = req.path.gsub('/user/', '')
     user = User.find_by_name name
-    UserView.new(user).render
+    begin
+      doc = UserView.new(user).render
+      [200, {}, [doc]]
+    rescue StandardError => e
+      puts e.full_message
+      internal_server_error
+    end
+  end
+
+  def internal_server_error
+    [500, {}, ['internal server error']]
   end
 end
