@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../helpers/time'
-
 def base_html(title, child)
   "<!DOCTYPE html>
   <html>

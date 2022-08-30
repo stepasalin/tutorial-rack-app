@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../../helpers/time'
-
 def user_section(user)
-  age = born_timestamp_to_year_month_day user.age
+  age = user.readable_age
   "<div>
     <p>name: #{user.name}</p>
     <p>gender: #{user.gender}</p>

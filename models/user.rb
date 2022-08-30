@@ -6,6 +6,8 @@ class UnprocessableUserError < RuntimeError; end
 
 class UserNameAlreadyTakenError < RuntimeError; end
 
+class UserNotFoundError < RuntimeError; end
+
 class User
   GENDERS = %i[fm m nb].freeze
 
@@ -45,37 +47,45 @@ class User
     }.to_json(args)
   end
 
-  # fixme?
   def self.find_by_name(name)
     raw = REDIS_CONNECTION.get(name)
-    return nil if raw.nil? # not found error?
+    raise UserNotFoundError unless raw
 
     json = JSON.parse(raw)
-    return nil if json.nil? # not found error?
+    raise UnprocessableUserError unless json
 
     User.json_create(json)
   end
 
   def self.json_create(json)
-    puts json
     new(json['name'], json['gender'], json['age'].to_i)
+  end
+
+  def readable_age
+    age = Time.at @age
+    zero_time = Time.at 0
+    {
+      years: age.year - zero_time.year,
+      months: age.month - zero_time.month,
+      days: age.day - zero_time.day
+    }
   end
 
   private
 
   def age_valid?
-    @validation_errors << "age must be positive, actual = #{@age}" unless @age&.positive?
+    @validation_errors << "age must be positive, actual = #{@age}" unless @age.positive?
   end
 
   def gender_valid?
-    unless GENDERS.include?(@gender)
-      @validation_errors << "unknown gender, accepted = #{GENDERS.map(&:to_s)}, actual = #{@gender}"
-    end
+    return if GENDERS.include?(@gender)
+
+    @validation_errors << "unknown gender, accepted = #{GENDERS.map(&:to_s)}, actual = #{@gender}"
   end
 
   def name_valid?
-    unless @name&.length&.between?(1, 30)
-      @validation_errors << "name length must be between 1 and 30, actual = #{@name&.length}"
-    end
+    return if @name.length.between?(1, 30)
+
+    @validation_errors << "name length must be between 1 and 30, actual = #{@name&.length}"
   end
 end

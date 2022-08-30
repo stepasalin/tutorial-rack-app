@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../controllers/user'
+require_relative 'http_errors'
 
 class Router
   def initialize(req)
@@ -14,11 +15,7 @@ class Router
     elsif @req.path.start_with?('/user/') && @req.get?
       @user_controller.find_user(@req)
     else
-      not_found
+      route_not_found @req
     end
-  end
-
-  def not_found
-    [404, {}, ["Sorry, dunno what to do about #{@req.request_method} #{@req.path}"]]
   end
 end

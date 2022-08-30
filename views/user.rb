@@ -14,15 +14,9 @@ class UserView
   end
 
   def render
-    return not_found unless @user
-
     base_html(@user.name,
               "<div style=\"background-color:#{COLORS[@user.gender]};\">
                 #{user_section(@user)}
               </div>")
-  end
-
-  def not_found
-    base_html('not found', '<h1>User not found</h1>')
   end
 end
