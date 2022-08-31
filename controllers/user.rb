@@ -7,7 +7,25 @@ require_relative '../models/user'
 require_relative '../views/user'
 require_relative '../helpers/http_errors'
 
+class InvalidRequestError < RuntimeError; end
+
 class UserController
+
+  def update_user(req)
+    user = bind_user req
+    name = bind_user_name req
+    raise InvalidRequestError, 'user name in path not equal user name in body' if user.name != name
+
+    user.update
+    [200, {}, [user.to_json]]
+  end
+
+  def delete_user(req)
+    name = bind_user_name req
+    user = User.delete_by_name name
+    [200, {}, [user.to_json]]
+  end
+
   def new_user(req)
     user = bind_user req
     save_result = user.save

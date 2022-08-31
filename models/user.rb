@@ -2,14 +2,7 @@
 
 require 'json'
 
-class UnprocessableUserError < RuntimeError
-  attr_reader :validation_errors
-
-  def initialize(validation_errors)
-    @validation_errors = validation_errors
-    super
-  end
-end
+class UnprocessableUserError < RuntimeError; end
 
 class UserNameAlreadyTakenError < RuntimeError; end
 
@@ -36,10 +29,13 @@ class User
   end
 
   def save
-    raise UnprocessableUserError, @validation_errors unless valid?
     raise UserNameAlreadyTakenError if name_already_taken?
 
-    REDIS_CONNECTION.set(@name, to_json)
+    set
+  end
+
+  def update
+    set
   end
 
   def name_already_taken?
@@ -52,6 +48,14 @@ class User
       'gender' => @gender,
       'age' => @age
     }.to_json(args)
+  end
+
+  def self.delete_by_name(name)
+    user = find_by_name name
+    deleted_rows = REDIS_CONNECTION.del user.name
+    raise StandardError, "user found, but not deleted, name=#{user.name}" if deleted_rows.zero?
+
+    user
   end
 
   def self.find_by_name(name)
@@ -79,6 +83,12 @@ class User
   end
 
   private
+
+  def set
+    raise UnprocessableUserError, @validation_errors unless valid?
+
+    REDIS_CONNECTION.set(@name, to_json)
+  end
 
   def age_valid?
     @validation_errors << "age must be positive, actual = #{@age}" unless @age.positive?

@@ -12,7 +12,7 @@ class Router
   def handle
     if @req.path == '/api/new_user' && @req.post?
       @user_controller.new_user(@req)
-    elsif @req.path.start_with?('/user/') && @req.get?
+    elsif @req.path.start_with?('/user/')
       case @req.request_method
       when 'PUT'
         @user_controller.update_user(@req)
