@@ -9,30 +9,26 @@ require_relative '../helpers/http_errors'
 
 class UserController
   def new_user(req)
-    json = JSON.parse req.body.read
-    user = User.json_create json
+    user = bind_user req
     save_result = user.save
     [201, {}, [save_result]]
-  rescue UnprocessableUserError
-    [422, {}, [user.validation_errors.to_s]]
-  rescue UserNameAlreadyTakenError
-    [409, {}, ['user name already taken']]
-  rescue StandardError => e
-    puts e.full_message
-    internal_server_error
   end
 
   def find_user(req)
-    name = req.path.gsub('/user/', '')
+    name = bind_user_name req
     user = User.find_by_name name
     doc = UserView.new(user).render
     [200, {}, [doc]]
-  rescue UserNotFoundError
-    [404, {}, ['User not found']]
-  rescue UnprocessableUserError
-    [500, {}, ['Saved user have invalid format']]
-  rescue StandardError => e
-    puts e.full_message
-    internal_server_error
+  end
+
+  private
+
+  def bind_user(req)
+    json = JSON.parse req.body.read
+    User.json_create json
+  end
+
+  def bind_user_name(req)
+    req.path.gsub('/user/', '')
   end
 end

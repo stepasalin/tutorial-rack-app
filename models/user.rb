@@ -2,7 +2,14 @@
 
 require 'json'
 
-class UnprocessableUserError < RuntimeError; end
+class UnprocessableUserError < RuntimeError
+  attr_reader :validation_errors
+
+  def initialize(validation_errors)
+    @validation_errors = validation_errors
+    super
+  end
+end
 
 class UserNameAlreadyTakenError < RuntimeError; end
 
@@ -29,7 +36,7 @@ class User
   end
 
   def save
-    raise UnprocessableUserError unless valid?
+    raise UnprocessableUserError, @validation_errors unless valid?
     raise UserNameAlreadyTakenError if name_already_taken?
 
     REDIS_CONNECTION.set(@name, to_json)
@@ -52,7 +59,7 @@ class User
     raise UserNotFoundError unless raw
 
     json = JSON.parse(raw)
-    raise UnprocessableUserError unless json
+    raise UnprocessableUserError, 'invalid json scheme' unless json
 
     User.json_create(json)
   end
