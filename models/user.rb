@@ -29,10 +29,13 @@ class User
   end
 
   def save
-    raise UnprocessableUserError unless valid?
     raise UserNameAlreadyTakenError if name_already_taken?
 
-    REDIS_CONNECTION.set(@name, to_json)
+    set
+  end
+
+  def update
+    set
   end
 
   def name_already_taken?
@@ -47,12 +50,20 @@ class User
     }.to_json(args)
   end
 
+  def self.delete_by_name(name)
+    user = find_by_name name
+    deleted_rows = REDIS_CONNECTION.del user.name
+    raise StandardError, "user found, but not deleted, name=#{user.name}" if deleted_rows.zero?
+
+    user
+  end
+
   def self.find_by_name(name)
     raw = REDIS_CONNECTION.get(name)
     raise UserNotFoundError unless raw
 
     json = JSON.parse(raw)
-    raise UnprocessableUserError unless json
+    raise UnprocessableUserError, 'invalid json scheme' unless json
 
     User.json_create(json)
   end
@@ -72,6 +83,12 @@ class User
   end
 
   private
+
+  def set
+    raise UnprocessableUserError, @validation_errors unless valid?
+
+    REDIS_CONNECTION.set(@name, to_json)
+  end
 
   def age_valid?
     @validation_errors << "age must be positive, actual = #{@age}" unless @age.positive?

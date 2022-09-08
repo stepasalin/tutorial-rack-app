@@ -7,32 +7,46 @@ require_relative '../models/user'
 require_relative '../views/user'
 require_relative '../helpers/http_errors'
 
+class InvalidRequestError < RuntimeError; end
+
 class UserController
+
+  def update_user(req)
+    user = bind_user req
+    name = bind_user_name req
+    raise InvalidRequestError, 'user name in path not equal user name in body' if user.name != name
+
+    user.update
+    [200, {}, [user.to_json]]
+  end
+
+  def delete_user(req)
+    name = bind_user_name req
+    user = User.delete_by_name name
+    [200, {}, [user.to_json]]
+  end
+
   def new_user(req)
-    json = JSON.parse req.body.read
-    user = User.json_create json
+    user = bind_user req
     save_result = user.save
     [201, {}, [save_result]]
-  rescue UnprocessableUserError
-    [422, {}, [user.validation_errors.to_s]]
-  rescue UserNameAlreadyTakenError
-    [409, {}, ['user name already taken']]
-  rescue StandardError => e
-    puts e.full_message
-    internal_server_error
   end
 
   def find_user(req)
-    name = req.path.gsub('/user/', '')
+    name = bind_user_name req
     user = User.find_by_name name
     doc = UserView.new(user).render
     [200, {}, [doc]]
-  rescue UserNotFoundError
-    [404, {}, ['User not found']]
-  rescue UnprocessableUserError
-    [500, {}, ['Saved user have invalid format']]
-  rescue StandardError => e
-    puts e.full_message
-    internal_server_error
+  end
+
+  private
+
+  def bind_user(req)
+    json = JSON.parse req.body.read
+    User.json_create json
+  end
+
+  def bind_user_name(req)
+    req.path.gsub('/user/', '')
   end
 end

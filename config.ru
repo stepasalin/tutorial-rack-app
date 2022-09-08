@@ -1,11 +1,17 @@
+# frozen_string_literal: true
+
 require 'rack'
 require 'pry'
 require 'json'
 require_relative 'helpers/router'
+require_relative 'middlewares/errors_catcher'
 
 run do |env|
-  req = Rack::Request.new(env)
-  Router.new(req).handle
+  ErrorsCatcher.new(
+    Router.new(
+      Rack::Request.new(env)
+    )
+  ).handle
 end
 
 # Валидации на User

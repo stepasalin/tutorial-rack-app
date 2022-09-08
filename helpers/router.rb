@@ -12,8 +12,17 @@ class Router
   def handle
     if @req.path == '/api/new_user' && @req.post?
       @user_controller.new_user(@req)
-    elsif @req.path.start_with?('/user/') && @req.get?
-      @user_controller.find_user(@req)
+    elsif @req.path.start_with?('/user/')
+      case @req.request_method
+      when 'PUT'
+        @user_controller.update_user(@req)
+      when 'DELETE'
+        @user_controller.delete_user(@req)
+      when 'GET'
+        @user_controller.find_user(@req)
+      else
+        route_not_found @req
+      end
     else
       route_not_found @req
     end
