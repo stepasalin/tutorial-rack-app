@@ -1,5 +1,5 @@
 class User
-  attr_reader :name, :gender, :age, :data
+  attr_reader :name, :gen, :age, :errors
 
   def initialize(pars)
     @name = pars['name'].to_s
@@ -17,21 +17,16 @@ class User
     new(JSON.parse(pars))
   end
 
-  def validator
-    @errors << 'The name must be a string from 1 to 30 characters' if @name.empty? || @name.length > 30
-    @errors << 'Gender must be :m, :f or :nb' unless [':m', ':f', ':nb'].include?(@gen) # TODO ПОЧИТАТЬ ПРО INCLUDE СДЕЛАТЬ МАССИС И СРАВНИВАТЬ прогнать рубокоп
-    @errors << 'Age must be > 0' unless @age.positive?
+  def self.delete_from_redis(name)
+    raise ExistingError.new, "Name doesn't exists" unless REDIS_CONNECTION.exists?(name)
+
+    REDIS_CONNECTION.del(name)
   end
 
-  def time_convert
-    time = @age
-    time = time / 60 / 60 / 24
-    days = time % 30
-    time /= 30
-    months = time % 12
-    time /= 12
-    years = time
-    [years, months, days]
+  def validator
+    @errors << 'The name must be a string from 1 to 30 characters' if @name.empty? || @name.length > 30
+    @errors << 'Gender must be :m, :f or :nb' unless %w[:m :f :nb].include?(@gen)
+    @errors << 'Age must be > 0' unless @age.positive?
   end
 
   def to_json
@@ -47,24 +42,12 @@ class User
     raise ExistingError.new, 'Name exists' if REDIS_CONNECTION.exists?(@name)
 
     REDIS_CONNECTION.set(@name, to_json)
+  end
 
-  def user_get
-    raise ArgumentsError.new, "Bad data from database: #{@errors}" if @errors.any?
+  def update_record_in_redis
+    raise ArgumentsError.new, "Wrong arguments: #{@errors}" if @errors.any?
+    raise ExistingError.new, "Name doesn't exists" unless REDIS_CONNECTION.exists?(@name)
 
-    case @gen
-    when ':m'
-      bgcolor = 'blue'
-    when ':f'
-      bgcolor = 'pink'
-    when ':nb'
-      bgcolor = 'gray'
-    end
-    age_readable = time_convert
-    @data = %(<html>
-      <body bgcolor = #{bgcolor}>
-      <h1>#{@name}</h1>
-      <p>#{age_readable[0]} years, #{age_readable[1]} months, #{age_readable[2]} days</p>
-      </body>
-      </html>)
+    REDIS_CONNECTION.getset(@name, to_json)
   end
 end
