@@ -35,6 +35,8 @@ class User
   end
 
   def update
+    raise UserNotFoundError unless name_already_taken?
+
     set
   end
 
