@@ -49,7 +49,6 @@ DEPENDENCIES
   rack (= 3.0.0.beta1)
   rackup (~> 0.2.2)
   redis (~> 4.7)
-  rubocop
   rubocop-taxdome!
 
 RUBY VERSION

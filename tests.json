@@ -26,10 +26,6 @@
     "expected result": "409 already taken"
   },
   {
-    "route": "/some/unknown",
-    "expected result": "404"
-  },
-  {
     "route": "/user/somename",
     "method": "POST",
     "expected result": "404"
@@ -48,8 +44,8 @@
         "expected result": "200 ${updated user}"
       },
       {
-        "method": "GET",
-        "expected result": "200 ${updated user}"
+        "user.db": "get(somename)",
+        "expected result": "${updated user}"
       }
     ]
   },
@@ -94,15 +90,15 @@
   },
   {
     "route": "/user/somename",
-    "precondition": "user with somename already created",
+    "precondition": "user with 'somename' already created",
     "steps": [
       {
         "method": "DELETE",
         "expected result": "200 ${deleted user}"
       },
       {
-        "method": "GET",
-        "expected result": "404"
+        "user.db": "get(somename)",
+        "expected result": "nil"
       }
     ]
   },
@@ -120,9 +116,8 @@
         "expected result": "201"
       },
       {
-        "route": "/user/somename",
-        "method": "get",
-        "expected result": "200 ${created user}"
+        "user.db": "get(somename)",
+        "expected result": "${created user}"
       }
     ]
   }
