@@ -1,0 +1,15 @@
+services:
+  redis:
+    image: redis:7.0-alpine
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: redis-server --bind 0.0.0.0
+    env_file:
+      - .env
+  redis_test:
+    image: redis:7.0-alpine
+    ports:
+      - "${REDIS_TEST_PORT}:6379"
+    command: redis-server --bind 0.0.0.0
+    env_file:
+      - .env

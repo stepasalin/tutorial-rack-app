@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative '../app'
+require_relative '../helpers/redis'
+
 require 'json'
 
 class UnprocessableUserError < RuntimeError; end
