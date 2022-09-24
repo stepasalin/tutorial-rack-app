@@ -9,6 +9,7 @@ class RackResponse
   end
 end
 
-def wrap_rack_response(raw_response)
-  RackResponse.new raw_response[0], raw_response[2][0]
+def execute_rack_request(app, request)
+  response = app.call request
+  RackResponse.new response[0], response[2][0]
 end

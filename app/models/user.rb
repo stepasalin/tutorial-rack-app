@@ -87,6 +87,12 @@ class User
     }
   end
 
+  def ==(other)
+    name == other.name &&
+      age == other.age &&
+      gender == other.gender
+  end
+
   private
 
   def set

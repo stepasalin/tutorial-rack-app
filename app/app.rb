@@ -5,7 +5,6 @@ require_relative 'helpers/router'
 require_relative 'controllers/user'
 
 class Application
-
   def call(env)
     ErrorsCatcher.new(
       Router.new(
