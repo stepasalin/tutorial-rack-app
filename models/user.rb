@@ -84,6 +84,10 @@ class User
     }
   end
 
+  def reload
+    User.find_by_name(@name)
+  end
+
   private
 
   def set

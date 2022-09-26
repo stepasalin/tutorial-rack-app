@@ -8,3 +8,4 @@ gem "pry"
 
 gem "redis", "~> 4.7"
 gem 'rubocop-taxdome', group: 'development', git: 'https://gitlab.com/taxdome/forks/rubocop-taxdome.git', branch: 'main'
+gem 'rspec'

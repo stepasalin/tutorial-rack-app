@@ -1,18 +1,8 @@
 # frozen_string_literal: true
+require_relative './app'
 
-require 'rack'
-require 'pry'
-require 'json'
-require_relative 'helpers/router'
-require_relative 'middlewares/errors_catcher'
-
-run do |env|
-  ErrorsCatcher.new(
-    Router.new(
-      Rack::Request.new(env)
-    )
-  ).handle
-end
+app = Application.new
+run app
 
 # Валидации на User
 # name может быть строкой от 1 до 30 символов латиницей без пробелов
