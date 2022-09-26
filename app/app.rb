@@ -3,6 +3,7 @@
 require_relative 'middlewares/errors_catcher'
 require_relative 'helpers/router'
 require_relative 'controllers/user'
+require 'rack'
 
 class Application
   def call(env)
