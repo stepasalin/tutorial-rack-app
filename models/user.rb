@@ -32,6 +32,7 @@ class User
     raise UserNameAlreadyTakenError if name_already_taken?
 
     set
+    self
   end
 
   def update

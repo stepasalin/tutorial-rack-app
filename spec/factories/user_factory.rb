@@ -1,13 +1,11 @@
+require_relative '../test_helpers/gen_random_params'
 class UserFactory
-  attr_reader :name, :gender, :age
   def self.create
-    @name = 'TestName'
-    @gender = 'fm'
-    @age = 123123211
+    name = gen_random_string(30)
+    gender = gen_random_gender
+    age = gen_random_age
 
-    user = User.new(@name, @gender, @age)
+    user = User.new(name, gender, age)
     user.save
-    # TODO сделать чтоб user.save возвращал юзера
-    { 'name' => @name, 'gender' => @gender, 'age' => @age }
   end
 end
