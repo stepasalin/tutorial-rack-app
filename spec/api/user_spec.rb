@@ -16,38 +16,38 @@ RSpec.describe UserController do
 
   context 'user validation' do
     it 'validates multiple invalid params' do
-      user = { name: '', age: -1, gender: :unknown }
+      user = UserFactory.generate_user name: '', age: -1, gender: :unknown
       req = generate_request_env 'POST', '/api/new_user', user
 
       resp = execute_rack_request app, req
       expect(resp.status).to eq 422
       resp_body = JSON.parse(resp.body)
       expect(resp_body).to match_array [
-        "name length must be between 1 and 30, actual = #{user[:name].length}",
-        "unknown gender, accepted = #{User::GENDERS.map(&:to_s)}, actual = #{user[:gender]}",
-        "age must be positive, actual = #{user[:age]}"
+        "name length must be between 1 and 30, actual = #{user.name.length}",
+        "unknown gender, accepted = #{User::GENDERS.map(&:to_s)}, actual = #{user.gender}",
+        "age must be positive, actual = #{user.age}"
       ]
 
-      expect { User.find_by_name user[:name] }.to raise_error UserNotFoundError
+      expect { User.find_by_name user.name }.to raise_error UserNotFoundError
     end
 
     it 'validates too long name' do
-      user = { name: ('a' * 31), age: 1, gender: :nb }
+      user = UserFactory.generate_user name: ('a' * 31), age: 1, gender: :nb
       req = generate_request_env 'POST', '/api/new_user', user
 
       resp = execute_rack_request app, req
       expect(resp.status).to eq 422
       resp_body = JSON.parse(resp.body)
       expect(resp_body).to match_array [
-        "name length must be between 1 and 30, actual = #{user[:name].length}"
+        "name length must be between 1 and 30, actual = #{user.name.length}"
       ]
 
-      expect { User.find_by_name user[:name] }.to raise_error UserNotFoundError
+      expect { User.find_by_name user.name }.to raise_error UserNotFoundError
     end
   end
 
   it 'creates user successfully' do
-    user = UserFactory.create_user
+    user = UserFactory.generate_user
     req = generate_request_env 'POST', '/api/new_user', user
 
     resp = execute_rack_request app, req
@@ -55,39 +55,26 @@ RSpec.describe UserController do
     expect(resp.body).to eq 'OK'
 
     saved_user = User.find_by_name user.name
-    expect(user).to eq saved_user
-  end
-
-  xit 'sends get by user creation route' do
-    method = 'GET'
-    path = '/api/new_user'
-    req = generate_request_env method, path
-
-    resp = execute_rack_request app, req
-    expect(resp.status).to eq 404
-    expect(resp.body).to eq "Sorry, dunno what to do about #{method} #{path}"
+    expect(saved_user).to eq user
   end
 
   it 'creates user with already took name' do
-    user = UserFactory.create_user save: true
-    req = generate_request_env 'POST', '/api/new_user', user
+    user = UserFactory.create_user
+    user_update_params = { name: user.name, age: 123, gender: :nb }
+    req = generate_request_env 'POST', '/api/new_user', user_update_params
 
     resp = execute_rack_request app, req
     expect(resp.status).to eq 409
     expect(resp.body).to eq 'user name already taken'
-  end
 
-  xit 'sends post by not accepted user route' do
-
+    user_from_db = User.find_by_name user.name
+    expect(user_from_db).to eq user
   end
 
   context 'user updating' do
     it 'updates created user' do
       name = 'user123'
-      original_age = 20_000_000
-      original_gender = :m
-      user = User.new(name, original_gender, original_age)
-      user.save
+      UserFactory.create_user name: name
 
       updated_age = rand 10_000
       updated_gender = :nb
@@ -104,7 +91,7 @@ RSpec.describe UserController do
     end
 
     it 'updates created user with multiple invalid params' do
-      user = UserFactory.create_user save: true
+      user = UserFactory.create_user
 
       user_update_params = { name: user.name, gender: :unknown, age: -1 }
       req = generate_request_env 'PUT', "/user/#{user.name}", user_update_params
@@ -116,42 +103,54 @@ RSpec.describe UserController do
         "unknown gender, accepted = #{User::GENDERS.map(&:to_s)}, actual = #{user_update_params[:gender]}",
         "age must be positive, actual = #{user_update_params[:age]}"
       ]
+
+      user_from_db = User.find_by_name user.name
+      expect(user_from_db).to eq user
     end
 
     it 'updates user with different names in path and body' do
-      user = UserFactory.create_user save: true
+      user = UserFactory.create_user
       req = generate_request_env 'PUT', '/user/just-random-string', user
 
       resp = execute_rack_request app, req
       expect(resp.status).to eq 400
       expect(resp.body).to eq 'user name in path not equal user name in body'
+
+      user_from_db = User.find_by_name user.name
+      expect(user_from_db).to eq user
     end
 
     it 'updates not exists user' do
-      user = UserFactory.create_user
+      user = UserFactory.generate_user
       req = generate_request_env 'PUT', "/user/#{user.name}", user
 
       resp = execute_rack_request app, req
       expect(resp.status).to eq 404
       expect(resp.body).to eq 'User not found'
+
+      expect { User.find_by_name user.name }.to raise_error UserNotFoundError
     end
   end
 
   it 'deletes not exists user' do
-    user = UserFactory.create_user
+    user = UserFactory.generate_user
     req = generate_request_env 'DELETE', "/user/#{user.name}", user
 
     resp = execute_rack_request app, req
     expect(resp.status).to eq 404
     expect(resp.body).to eq 'User not found'
+
+    expect { User.find_by_name user.name }.to raise_error UserNotFoundError
   end
 
   it 'deletes user successfully' do
-    user = UserFactory.create_user save: true
+    user = UserFactory.create_user
     req = generate_request_env 'DELETE', "/user/#{user.name}", user
 
     resp = execute_rack_request app, req
     expect(resp.status).to eq 200
     expect(resp.body).to eq user.to_json
+
+    expect { User.find_by_name user.name }.to raise_error UserNotFoundError
   end
 end
