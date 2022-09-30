@@ -4,41 +4,46 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      posts: []
-    }
+      user: {},
+      nameInputValue: '',
+      isLoading: false
+    };
+  }
+  handleNameInputChange(event){
+    this.setState({ nameInputValue: event.target.value} )
   }
 
-  componentDidMount() {
-    const url = "https://jsonplaceholder.typicode.com/posts";
-    fetch(url)
+  sendRawUserRequest(){
+    this.setState( {isLoding: true} );
+    fetch(`/raw_user/${this.state.nameInputValue}`)
     .then(response => response.json())
-    .then(json => this.setState({ posts: json }))
-  }
-
-  someApiCall() {
-    fetch('/someapicall')
-    .then(response => response.json())
-    .then(json => this.setState({ posts: json }))
+    .then(json => this.setState( { user: json })) 
+    this.setState( {isLoding: false} );
   }
 
   render() {
-    const { posts } = this.state;
+    const { nameInputValue } = this.state;
+    const { user } = this.state;
     return (
       <div className="container">
         <div class="jumbotron">
-          <h1 class="display-4">Blog posts</h1>
+          <h1 class="display-4">{nameInputValue}</h1>
         </div>
-        <button onClick={this.someApiCall}>Letz go bitch</button>
-        {posts.map((post) => (
-          <div className="card" key={post.id}>
-            <div className="card-header">
-              #{post.id} {post.title}
-            </div>
-            <div className="card-body">
-              <p className="card-text">{post.body}</p>
-            </div>
+        <button onClick={this.sendRawUserRequest.bind(this)}>Search</button>
+        <input
+          type="text"
+          id="user_name"
+          name="user_name"
+          onChange={this.handleNameInputChange.bind(this)}
+          value={nameInputValue}
+        />
+        <RenderUser />
+        {/* <div>
+          <div className="card-header">
+            <p className="card-text">Gender: {user.gender}</p>
+            <p className="card-text">Age: {user.age}</p>
           </div>
-        ))}
+        </div> */}
       </div>
     );
   }

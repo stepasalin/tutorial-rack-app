@@ -23,6 +23,11 @@ class Router
       else
         route_not_found @req
       end
+    elsif @req.path.start_with?('/raw_user/')
+      case @req.request_method
+      when 'GET'
+        @user_controller.raw_user(@req)
+      end
     else
       route_not_found @req
     end
