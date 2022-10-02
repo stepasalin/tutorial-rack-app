@@ -3,6 +3,7 @@ import LoadingSpinner from "./spinner/LoadingSpinner";
 // import "./styles.css";
 
 export default function App() {
+  const [userOutdated, setUserOutdated] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [user, setUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -12,24 +13,30 @@ export default function App() {
   }
   const handleFetch = () => {
     setIsLoading(true);
+    setUserOutdated(true);
     fetch(`/raw_user/${inputValue}`)
       .then((respose) => respose.json())
       .then((response) => {
          setUser(response)
          setIsLoading(false)
+         setUserOutdated(false)
       })
       .catch(() => {
          setErrorMessage("Unable to fetch user");
          setIsLoading(false);
+         setUserOutdated(false);
       });
   };
-  const renderUser = (
-    <div className="userlist-container">
-      <ul>
+  const userForm = (
+    <ul>
         <li>Name: {user.name}</li>
         <li>Gender: {user.gender}</li>
         <li>Age: {user.age}</li>
-      </ul>
+      </ul> 
+  )
+  const renderUser = (
+    <div className="userlist-container">
+      {userOutdated ? <div/> : userForm }
     </div>
   );
   return (
