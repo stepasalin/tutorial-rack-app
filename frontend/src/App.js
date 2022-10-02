@@ -14,6 +14,7 @@ export default function App() {
   const handleFetch = () => {
     setIsLoading(true);
     setUserOutdated(true);
+    setErrorMessage('');
     fetch(`/raw_user/${inputValue}`)
       .then((respose) => respose.json())
       .then((response) => {
@@ -29,14 +30,15 @@ export default function App() {
   };
   const userForm = (
     <ul>
-        <li>Name: {user.name}</li>
-        <li>Gender: {user.gender}</li>
-        <li>Age: {user.age}</li>
-      </ul> 
+      <li>Name: {user.name}</li>
+      <li>Gender: {user.gender}</li>
+      <li>Age: {user.age}</li>
+    </ul>
   )
   const renderUser = (
     <div className="userlist-container">
       {userOutdated ? <div/> : userForm }
+      {errorMessage && <div className="error">{errorMessage}</div>}
     </div>
   );
   return (
@@ -50,7 +52,7 @@ export default function App() {
           value={inputValue}
         />
       {isLoading ? <LoadingSpinner /> : renderUser}
-      {errorMessage && <div className="error">{errorMessage}</div>}
+      {/* {errorMessage && <div className="error">{errorMessage}</div>} */}
       <button onClick={handleFetch} disabled={isLoading}>
         Fetch User
       </button>
