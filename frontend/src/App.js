@@ -14,7 +14,7 @@ export default function App() {
   const handleFetch = () => {
     setIsLoading(true);
     setUserOutdated(true);
-    setErrorMessage('');
+    setErrorMessage('');  
     fetch(`/raw_user/${inputValue}`)
       .then((respose) => respose.json())
       .then((response) => {
