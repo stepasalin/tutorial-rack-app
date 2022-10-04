@@ -2,7 +2,7 @@ services:
   redis:
     image: redis:7.0-alpine
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_DEV_PORT}:6379"
     command: redis-server --bind 0.0.0.0
     env_file:
       - .env

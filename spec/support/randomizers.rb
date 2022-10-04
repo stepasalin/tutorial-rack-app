@@ -7,7 +7,7 @@ def random_string(len = 10)
 end
 
 def random_user_gender
-  User::GENDERS[rand(0..User::GENDERS.size - 1)]
+  User::GENDERS[rand(User::GENDERS.size - 1)]
 end
 
 # 51_840_000 = 20 years
