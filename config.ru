@@ -15,6 +15,12 @@ run do |env|
     key = req.path.gsub('/user/','')
     value = REDIS_CONNECTION.get(key) || ''
     [200, {}, [value]]
+  elsif req.post? && req.path.start_with?('/user/ros')
+    req_body = JSON.parse(req.body.read)
+    req_body.each do |key, val|
+      REDIS_CONNECTION.set(key, val)
+    end
+    [200, {}, ["Hello, Stepan! I've got your request: #{req_body}"]]
   else
     [404,{}, ["Sorry, dunno what to do about #{req.request_method} #{req.path}"]]
   end
@@ -38,7 +44,5 @@ end
 # отобразить (дизайнерствуйте сами) как юзера зовут и его возраст в формате 
 # "столько-то лет, столько-то месяцев, столько-то дней". 
 # для удобства будем считать, что в каждом году 365 дней, а в каждом месяце - 30
-
-
-
+# добавить elseif обеспечить возможность при помощи post че-то положить в БД
 
