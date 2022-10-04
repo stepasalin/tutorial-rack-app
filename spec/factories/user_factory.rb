@@ -1,11 +1,11 @@
-require_relative '../test_helpers/gen_random_params'
+require_relative '../test_helpers/randomizer'
 class UserFactory
-  def self.create
-    name = gen_random_string(30)
-    gender = gen_random_gender
-    age = gen_random_age
+  def self.create(gender: nil, age: nil)
+    name = gen_random_string
 
-    user = User.new(name, gender, age)
+    user = User.new(name, 
+      gender || gen_random_gender,
+      age || gen_random_age)
     user.save
   end
 end

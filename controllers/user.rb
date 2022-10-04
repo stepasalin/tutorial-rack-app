@@ -29,7 +29,7 @@ class UserController
   def new_user(req)
     user = bind_user req
     save_result = user.save
-    [201, {}, [save_result]]
+    [201, {}, [save_result.to_json]]
   end
 
   def find_user(req)
