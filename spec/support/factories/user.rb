@@ -4,15 +4,15 @@ require_relative '../../../app/models/user'
 
 class UserFactory
 
-  def self.create_user(user_sample = nil)
-    user = generate_user user_sample
+  def self.create_user(name: nil, gender: nil, age: nil)
+    user = generate_user name: name, gender: gender, age: age
     user.save
     user
   end
 
-  def self.generate_user(user_sample = nil)
-    User.new user_sample&.dig(:name) || random_string,
-             user_sample&.dig(:gender) || random_user_gender,
-             user_sample&.dig(:age) || random_age_in_seconds
+  def self.generate_user(name: nil, gender: nil, age: nil)
+    User.new name || random_string,
+             gender || random_user_gender,
+             age || random_age_in_seconds
   end
 end

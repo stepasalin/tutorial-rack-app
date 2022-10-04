@@ -58,7 +58,7 @@ RSpec.describe UserController do
     expect(saved_user).to eq user
   end
 
-  it 'creates user with already took name' do
+  it 'cannot create user with already taken name' do
     user = UserFactory.create_user
     user_update_params = { name: user.name, age: 123, gender: :nb }
     req = generate_request_env 'POST', '/api/new_user', user_update_params
@@ -120,7 +120,7 @@ RSpec.describe UserController do
       expect(user_from_db).to eq user
     end
 
-    it 'updates not exists user' do
+    it 'cannot update not exists user' do
       user = UserFactory.generate_user
       req = generate_request_env 'PUT', "/user/#{user.name}", user
 
@@ -132,7 +132,7 @@ RSpec.describe UserController do
     end
   end
 
-  it 'deletes not exists user' do
+  it 'cannot delete not exists user' do
     user = UserFactory.generate_user
     req = generate_request_env 'DELETE', "/user/#{user.name}", user
 
