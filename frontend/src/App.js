@@ -11,22 +11,33 @@ export default function App() {
   const handleNameInputChange = (event) => {
     setInputValue(event.target.value)
   }
+  const handleResponse = (response) => {
+    if(response.status === 200) {
+      response.text().then(
+        (resText) => {
+          setIsLoading(false);
+          setUserOutdated(false);
+          setUser(JSON.parse(resText));
+        }
+      )
+    }
+    if(response.status === 404) {
+      response.text().then(
+        (resText) => {
+          setIsLoading(false);
+          setUserOutdated(false);
+          setUser({});
+          setErrorMessage(resText);
+        }
+      )
+    }
+  };
   const handleFetch = () => {
     setIsLoading(true);
     setUserOutdated(true);
     setErrorMessage('');  
     fetch(`/raw_user/${inputValue}`)
-      .then((respose) => respose.json())
-      .then((response) => {
-         setUser(response)
-         setIsLoading(false)
-         setUserOutdated(false)
-      })
-      .catch(() => {
-         setErrorMessage("Unable to fetch user");
-         setIsLoading(false);
-         setUserOutdated(false);
-      });
+      .then((response) => handleResponse(response));
   };
   const userForm = (
     <ul>
