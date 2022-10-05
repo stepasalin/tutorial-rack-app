@@ -42,7 +42,6 @@ class UserController
   def raw_user(req)
     name = bind_raw_user_name req
     user = User.find_by_name name
-    sleep(rand(10..20))
     [200,{},[user.to_json]]
   end
 
