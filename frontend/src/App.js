@@ -12,25 +12,29 @@ export default function App() {
     setInputValue(event.target.value)
   }
   const handleResponse = (response) => {
-    if(response.status === 200) {
-      response.text().then(
-        (resText) => {
-          setIsLoading(false);
-          setUserOutdated(false);
-          setUser(JSON.parse(resText));
-        }
-      )
-    }
-    if(response.status === 404) {
-      response.text().then(
-        (resText) => {
-          setIsLoading(false);
-          setUserOutdated(false);
-          setUser({});
-          setErrorMessage(resText);
-        }
-      )
-    }
+    if(response.status === 200) { handle200(response) }
+    if(response.status === 404) { handle404(response) }
+  };
+
+  const handle200 = (response) => {
+    response.text().then(
+      (resText) => {
+        setIsLoading(false);
+        setUserOutdated(false);
+        setUser(JSON.parse(resText));
+      }
+    )
+  };
+
+  const handle404 = (response) => {
+    response.text().then(
+      (resText) => {
+        setIsLoading(false);
+        setUserOutdated(false);
+        setUser({});
+        setErrorMessage(resText);
+      }
+    )
   };
   const handleFetch = () => {
     setIsLoading(true);
