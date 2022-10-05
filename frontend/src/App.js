@@ -1,3 +1,4 @@
+import './App.css'
 import React, { useState } from "react";
 import LoadingSpinner from "./spinner/LoadingSpinner";
 // import "./styles.css";
@@ -51,14 +52,14 @@ export default function App() {
     </ul>
   )
   const renderUser = (
-    <div className="userlist-container">
+    <div className="app card">
       {userOutdated ? <div/> : userForm }
       {errorMessage && <div className="error">{errorMessage}</div>}
     </div>
   );
   return (
-    <div className="App">
-      <h1>Search for user: {inputValue}</h1>
+    <div>
+      <h1 className="App-header">Search for user: {inputValue}</h1>
        <input
           type="text"
           id="id"
