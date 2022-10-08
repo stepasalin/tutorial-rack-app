@@ -44,7 +44,7 @@ export default function AddUser() {
     if(response.status >= 400 && response.status < 500) { handle4xx(response); return }
   };
 
-  const handleFetch = () => {
+  const handleCreate = () => {
     setIsLoading(true);
     setErrorMessage('');
     setSuccessMessage('');
@@ -53,10 +53,27 @@ export default function AddUser() {
       "gender":`${gender}`,
       "age":`${age}`
     }
-    console.log(body)
     fetch('/api/new_user',
       {
         method: 'post',
+        body: JSON.stringify(body)
+      }
+    )
+    .then((response) => handleResponse(response));
+  };
+
+  const handleUpdate = () => {
+    setIsLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+    const body = {
+      "name":`${name}`,
+      "gender":`${gender}`,
+      "age":`${age}`
+    }
+    fetch(`/user/${name}`,
+      {
+        method: 'put',
         body: JSON.stringify(body)
       }
     )
@@ -95,11 +112,14 @@ export default function AddUser() {
   )
   return (
     <div>
-      <h1 className="App-header">CreateUser</h1>
+      <h1 className="App-header">Create/Update User</h1>
 
       {isLoading ? <LoadingSpinner /> : inputForm}
-      <button onClick={handleFetch} disabled={isLoading}>
+      <button onClick={handleCreate} disabled={isLoading}>
         Create User
+      </button>
+      <button onClick={handleUpdate} disabled={isLoading}>
+        Update User
       </button>
     </div>
   );

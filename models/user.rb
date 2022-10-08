@@ -61,7 +61,6 @@ class User
   end
 
   def self.find_by_name(name)
-    sleep rand(3..9)
     raw = REDIS_CONNECTION.get(name)
     raise UserNotFoundError unless raw
 

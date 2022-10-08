@@ -10,6 +10,7 @@ class Router
   end
 
   def handle
+    sleep rand(1..5)
     if @req.path == '/api/new_user' && @req.post?
       @user_controller.new_user(@req)
     elsif @req.path.start_with?('/user/')
