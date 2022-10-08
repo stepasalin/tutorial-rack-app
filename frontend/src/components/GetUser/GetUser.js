@@ -1,6 +1,6 @@
 import './GetUser.css'
 import React, { useState } from "react";
-import LoadingSpinner from "./LoadingSpinner"
+import LoadingSpinner from "../LoadingSpinner/LoadingSpinner.js"
 
 export default function GetUser() {
   const [userOutdated, setUserOutdated] = useState(true);
@@ -67,7 +67,6 @@ export default function GetUser() {
           value={inputValue}
         />
       {isLoading ? <LoadingSpinner /> : renderUser}
-      {/* {errorMessage && <div className="error">{errorMessage}</div>} */}
       <button onClick={handleFetch} disabled={isLoading}>
         Fetch User
       </button>
