@@ -1,5 +1,6 @@
 import GetUser from './components/GetUser/GetUser.js'
 import AddUser from './components/AddUser/AddUser.js'
+import DeleteUser from './components/DeleteUser/DeleteUser.js'
 import React from "react";
 
 export default function App() {
@@ -8,6 +9,7 @@ export default function App() {
     <>
       <GetUser />
       <AddUser />
+      <DeleteUser />
     </>  
   );
 }
