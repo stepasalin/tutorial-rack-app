@@ -1,4 +1,4 @@
-import './DeleteUser.css'
+import './AllUsers.css'
 import React, { useState } from "react";
 import LoadingSpinner from "../LoadingSpinner/LoadingSpinner.js"
 
@@ -33,7 +33,6 @@ export default function DeleteUser() {
   const handleClick = () => {
     setIsLoading(true);
     setErrorMessage('');
-    setSuccessMessage('');
     fetch('/all_user_names',
       {
         method: 'get'
