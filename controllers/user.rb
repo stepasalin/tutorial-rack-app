@@ -45,6 +45,11 @@ class UserController
     [200,{},[user.to_json]]
   end
 
+  def all_user_names
+    #binding.pry
+    [200,{},[User.all_user_names.to_json]]
+  end
+
   private
 
   def bind_user(req)

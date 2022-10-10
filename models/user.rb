@@ -74,6 +74,10 @@ class User
     new(json['name'], json['gender'], json['age'].to_i)
   end
 
+  def self.all_user_names
+    REDIS_CONNECTION.keys('*')
+  end
+
   def readable_age
     age = Time.at @age
     zero_time = Time.at 0

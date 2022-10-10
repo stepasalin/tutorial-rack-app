@@ -29,6 +29,8 @@ class Router
       when 'GET'
         @user_controller.raw_user(@req)
       end
+    elsif @req.request_method == 'GET' && @req.path == '/all_user_names'
+      @user_controller.all_user_names
     else
       route_not_found @req
     end
