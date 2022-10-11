@@ -23,8 +23,13 @@ RSpec.configure do |config|
     end
     
     Capybara.default_driver = :chrome
+    Capybara.default_max_wait_time = 30
     
     Capybara.app = Rack::Builder.parse_file(File.expand_path('../config.ru', __dir__))
+  end
+
+  config.before(:example) do
+    REDIS_CONNECTION.flushall
   end
 end
 
