@@ -2,7 +2,6 @@
 
 require 'redis'
 require 'json'
-require_relative '../helpers/redis'
 require_relative '../models/user'
 require_relative '../views/user'
 require_relative '../helpers/http_errors'

@@ -4,6 +4,7 @@ require_relative '../controllers/user'
 require_relative 'http_errors'
 
 class Router
+
   def initialize(req)
     @req = req
     @user_controller = UserController.new

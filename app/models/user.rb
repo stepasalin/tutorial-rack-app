@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require_relative '../app'
+require_relative '../helpers/redis'
+
 require 'json'
 
 class UnprocessableUserError < RuntimeError; end
@@ -82,6 +85,12 @@ class User
       months: age.month - zero_time.month,
       days: age.day - zero_time.day
     }
+  end
+
+  def ==(other)
+    name == other.name &&
+      age == other.age &&
+      gender == other.gender
   end
 
   private
