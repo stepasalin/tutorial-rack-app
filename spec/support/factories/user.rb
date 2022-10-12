@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../../../app/models/user'
+require_relative '../randomizers'
 
 class UserFactory
 
