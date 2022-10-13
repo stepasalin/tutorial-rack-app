@@ -3,28 +3,24 @@ require 'pry'
 require 'json'
 require 'redis'
 require_relative 'helpers/redis_helper'
+require_relative 'user'
 
 run do |env|
   req = Rack::Request.new(env)
-  if req.post? && req.path == '/epic-post'
+  if req.post? && req.path == '/user/data'
     req_body = JSON.parse(req.body.read)
-    [200, {}, ["epic post detected! The body is #{req_body}"]]
-  elsif req.get? && req.path == '/epic-get'
-    [200, {}, ['epic get detected!']]
-  elsif req.get? && req.path.start_with?('/user/')
-    key = req.path.gsub('/user/','')
-    value = REDIS_CONNECTION.get(key) || ''
-    [200, {}, [value]]
-  elsif req.post? && req.path.start_with?('/user/ros')
-    req_body = JSON.parse(req.body.read)
-    req_body.each do |key, val|
-      REDIS_CONNECTION.set(key, val)
+    user = User.new(req_body)
+    if !user.valid?
+      [422, {}, user.errors]
+    elsif REDIS_CONNECTION.get(user.name)
+      [409, {}, ["User #{user.name} is used already"]]
+    else
+      REDIS_CONNECTION.set(user.name, req_body.to_json)
+      [201, {}, ["User accepted"]]
     end
-    [200, {}, ["Hello, Stepan! I've got your request: #{req_body}"]]
-  else
-    [404,{}, ["Sorry, dunno what to do about #{req.request_method} #{req.path}"]]
   end
 end
+
 
 # Валидации на User
 # name может быть строкой от 1 до 30 символов латиницей без пробелов
@@ -37,7 +33,7 @@ end
 # и если все валидации проходят, то кладет его в redis по ключу name
 # если валидации не проходят, то необходимо вернуть http-статус 422 и все человеко-читаемым текстом
 # если валидации проходят, но ключ уже занят, вернуть 409 и объяснение, что ключ уже занят
-
+# если все проходит, вернуть 201.
 # написать маршрут, который по GET /user/name отобразит HTML-страницу
 # требования:
 # фон синий если юзер мальчик, розовый если девочка, серый если не определился
