@@ -10,14 +10,30 @@ run do |env|
   if req.post? && req.path == '/user/data'
     req_body = JSON.parse(req.body.read)
     user = User.new(req_body)
-    if !user.valid?
+
+    begin
+      [201, {}, [user.save]]
+    rescue UserInvalidError
       [422, {}, user.errors]
-    elsif REDIS_CONNECTION.get(user.name)
+    rescue AccessKeyError
       [409, {}, ["User #{user.name} is used already"]]
-    else
-      REDIS_CONNECTION.set(user.name, req_body.to_json)
-      [201, {}, ["User accepted"]]
     end
+
+  # if req.get? && req.path == '/user/data'
+  #   req_body = JSON.parse(req.body.read)
+  #   user = User.new(req_body)
+  #   readuser.read
+  #   end
+
+
+    # if user.errors.any?
+    #   [422, {}, user.errors]
+    # elsif REDIS_CONNECTION.get(user.name)
+    #   [409, {}, ["User #{user.name} is used already"]]
+    # else
+    #   REDIS_CONNECTION.set(user.name, req_body.to_json)
+    #   [201, {}, ["User accepted"]]
+    # end
   end
 end
 
