@@ -2,6 +2,7 @@ require_relative 'helpers/redis_helper'
 
 class UserInvalidError < RuntimeError; end
 class AccessKeyError < RuntimeError; end
+class KeyUsedError < RuntimeError; end
 
 class User
   attr_reader :name, :gender, :age, :errors
@@ -45,4 +46,26 @@ class User
     end
   end
 
+  def self.find(user_name)
+    if !REDIS_CONNECTION.get(user_name)
+      raise KeyUsedError
+    else
+      json_user = REDIS_CONNECTION.get(user_name)
+      user_instance = User.new(JSON.parse(json_user))
+
+      if @errors.any?
+        raise UserInvalidError
+      else
+        user_instance
+      end
+    end
+  end
+
+  def to_h
+    {"name"=>@name, "gender"=>@gender, "age"=>@age}
+  end
+
+  def to_json
+    to_h.to_json
+  end
 end

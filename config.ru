@@ -1,40 +1,36 @@
 require 'rack'
 require 'pry'
 require 'json'
-require 'redis'
 require_relative 'helpers/redis_helper'
 require_relative 'user'
 
 run do |env|
   req = Rack::Request.new(env)
+
   if req.post? && req.path == '/user/data'
     req_body = JSON.parse(req.body.read)
     user = User.new(req_body)
 
     begin
-      [201, {}, [user.save]]
+      [201, {}, user.save]
     rescue UserInvalidError
       [422, {}, user.errors]
     rescue AccessKeyError
       [409, {}, ["User #{user.name} is used already"]]
     end
 
-  # if req.get? && req.path == '/user/data'
-  #   req_body = JSON.parse(req.body.read)
-  #   user = User.new(req_body)
-  #   readuser.read
-  #   end
+  elsif req.get? && req.path.start_with?('/user/data/')
+    user_name = req.path.gsub('/user/data/','')
 
-
-    # if user.errors.any?
-    #   [422, {}, user.errors]
-    # elsif REDIS_CONNECTION.get(user.name)
-    #   [409, {}, ["User #{user.name} is used already"]]
-    # else
-    #   REDIS_CONNECTION.set(user.name, req_body.to_json)
-    #   [201, {}, ["User accepted"]]
-    # end
+    begin
+      [200, {}, [User.find(user_name).to_json]]
+    rescue KeyUsedError
+      [404, {}, ["The key '#{user_name}' is not exist"]]
+    rescue UserInvalidError
+      [422, {}, user.errors]
+    end
   end
+
 end
 
 
