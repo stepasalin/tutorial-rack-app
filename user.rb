@@ -18,6 +18,7 @@ class User
     valid?
   end
 
+
   def valid?
     @errors = []
     unless @name =~ /^[\w\d]+$/
@@ -35,6 +36,7 @@ class User
     @errors.empty?
   end
 
+
   def save
     if @errors.any?
       raise UserInvalidError
@@ -45,6 +47,7 @@ class User
       @user_params.to_json
     end
   end
+
 
   def self.find(user_name)
     if !REDIS_CONNECTION.get(user_name)
@@ -68,4 +71,5 @@ class User
   def to_json
     to_h.to_json
   end
+
 end
