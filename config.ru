@@ -1,52 +1,7 @@
 require 'rack'
 require 'pry'
 require 'json'
-require_relative 'helpers/redis_helper'
-require_relative 'user'
-
-class UserController
-  attr_accessor :request
-
-  def initialize(request)
-    @request = request
-  end
-
-  def create_user
-    body = JSON.parse(request.body.read)
-    user = User.new(body)
-    create_reponse(user)
-  end
-
-
-  def get_user
-    user_name = request.path.gsub('/user/data/','')
-    get_user_response(user_name)
-  end
-
-
-  def create_response(user)
-    begin
-      [201, {}, user.save]
-    rescue UserInvalidError
-      [422, {}, user.errors]
-    rescue AccessKeyError
-      [409, {}, ["User #{user.name} is used already"]]
-    end
-  end
-
-
-  def get_user_response(user_name)
-    begin
-      [200, {}, [User.find(user_name).to_json]]
-    rescue KeyUsedError
-      [404, {}, ["The key '#{user_name}' is not exist"]]
-    rescue UserInvalidError
-      [422, {}, errors]
-    end
-  end
-end
-
-
+require_relative 'controllers/user'
 
 run do |env|
   req = Rack::Request.new(env)
@@ -55,6 +10,8 @@ run do |env|
     UserController.new(req).create_user
   elsif req.get? && req.path.start_with?('/user/data/')
     UserController.new(req).get_user
+  elsif req.delete? && req.path.start_with?('/user/data/')
+    UserController.new(req).delete_user
   end
 
 end
