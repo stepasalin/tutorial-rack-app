@@ -26,6 +26,14 @@ class UserController
   end
 
 
+  def update_user
+    user_name = request.path.gsub('/user/data/','')
+    body = JSON.parse(request.body.read)
+    updated_user = User.new(body)
+    update_user_response(user_name, updated_user)
+  end
+
+
   def create_response(user)
     begin
       [201, {}, [user.save]]
@@ -53,6 +61,19 @@ class UserController
       [202, {}, [User.delete(user_name)]]
     rescue KeyExistingdError
       [404, {}, ["The key '#{user_name}' is not exist"]]
+    end
+  end
+
+
+  def update_user_response(user_name, updated_user)
+    begin
+      [200, {}, [updated_user.update(user_name)]]
+    rescue KeyExistingdError
+      [404, {}, ["The key '#{user_name}' is not exist"]]
+    rescue UserNameError
+      [422, {}, ["User name cannot be changed"]]
+    rescue UserInvalidError
+      [422, {}, updated_user.errors]
     end
   end
 

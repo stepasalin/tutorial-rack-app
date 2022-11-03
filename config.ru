@@ -12,6 +12,8 @@ run do |env|
     UserController.new(req).get_user
   elsif req.delete? && req.path.start_with?('/user/data/')
     UserController.new(req).delete_user
+  elsif req.put? && req.path.start_with?('/user/data/')
+    UserController.new(req).update_user
   end
 
 end

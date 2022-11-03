@@ -3,6 +3,7 @@ require_relative '../helpers/redis_helper'
 class UserInvalidError < RuntimeError; end
 class AccessKeyError < RuntimeError; end
 class KeyExistingdError < RuntimeError; end
+class UserNameError < RuntimeError; end
 
 class User
   attr_reader :name, :gender, :age, :errors
@@ -13,7 +14,6 @@ class User
     @name = user_params["name"]
     @gender = user_params["gender"].to_sym
     @age = user_params["age"]
-    @user_params = user_params
 
     valid?
   end
@@ -43,8 +43,8 @@ class User
     elsif REDIS_CONNECTION.get(@name)
       raise AccessKeyError
     else
-      REDIS_CONNECTION.set(@name, @user_params.to_json)
-      @user_params.to_json
+      REDIS_CONNECTION.set(@name, to_json)
+      to_json
     end
   end
 
@@ -69,6 +69,21 @@ class User
     user_to_be_deleted
   end
 
+
+  def update(user_name)
+
+    if !REDIS_CONNECTION.get(user_name)
+      raise KeyExistingdError
+    elsif user_name != @name
+      raise UserNameError
+    elsif @errors.any?
+      raise UserInvalidError
+    else
+      REDIS_CONNECTION.set(user_name, to_json)
+      to_json
+    end
+
+  end
 
   def to_h
     {"name"=>@name, "gender"=>@gender, "age"=>@age}
