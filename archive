@@ -1,0 +1,78 @@
+# user_gender = [:f, :m, :nb]
+#     correct = []
+#     errors = []
+#     collected_user_data = {}
+#     req_body.each do |key, val|
+#       if key == 'name'
+#         name_length = req_body.length
+#         if name_length < 1 || name_length > 30
+#           errors << "Error of name '#{val}' = #{name_length} characters. Name lenght must be from 1 to 30 characters. "
+#         elsif val =~ /^[\w\d]+$/
+#           correct << "Your name '#{val}' accepted. "
+#           collected_user_data[key] = val
+#         else
+#           errors << "Error of name symbols '#{val}'. Accepted only leters and digits. "
+#         end
+#       elsif key == 'gender'
+#         if user_gender.include?(val)
+#           correct << "Gender '#{val}' accepted. "
+#           collected_user_data[key] = val
+#         else
+#           errors << "Error of gender '#{val}'. Correct genders are '#{:m}', '#{:f}' or '#{:nb}'. "
+#         end
+#       elsif key == 'age'
+#         if val.is_a?(Integer) && val.positive?
+#           correct << "Age '#{val}' accepted."
+#           collected_user_data[key] = val
+#         else
+#           errors << "Error of age '#{val}'. Age must be digits only."
+#         end
+#       end
+#     end
+#     if collected_user_data.keys.length == 3
+#       collected_user_data.each do |key, val|
+#         REDIS_CONNECTION.set(key, val)
+#       end
+#         [200, {}, correct]
+#     else
+#       [422, {}, errors]
+#     end
+#   end
+#   end
+  
+# end
+
+
+  # if req.post? && req.path == '/epic-post'
+  #   req_body = JSON.parse(req.body.read)
+  #   [200, {}, ["epic post detected! The body is #{req_body}"]]
+  # elsif req.get? && req.path == '/epic-get'
+  #   [200, {}, ['epic get detected!']]
+  # elsif req.get? && req.path.start_with?('/user/')
+  #   key = req.path.gsub('/user/','')
+  #   value = REDIS_CONNECTION.get(key) || ''
+  #   [200, {}, [value]]
+  # elsif req.post? && req.path == '/user/ros'
+  #   req_body = JSON.parse(req.body.read)
+  #   req_body.each do |key, val|
+  #     REDIS_CONNECTION.set(key, val)
+  #   end
+  #   [200, {}, ["Hello, Stepan! I've got your request: #{req_body}"]]
+  # elsif req.post? && req.path == '/ros'
+  #   req_body = JSON.parse(req.body.read)
+  #   key = req_body.keys.first
+  #   val = req_body[key]
+  #   if REDIS_CONNECTION.get(key)
+  #     [409, {}, ["Key #{key} is already used"]]
+  #   elsif val.is_a?(String)
+  #     [422, {}, ["Value #{val} shold be a number"]]
+  #   elsif val >= 0
+  #     REDIS_CONNECTION.set(key, val)
+  #     [200, {}, ["Hello, Stepan! I've applied your request: new key #{key} got value #{val}"]]
+  #   elsif val < 0
+  #     [422, {}, ["Value #{val} shold be >= 0"]]
+  #   end
+  # else
+  #   [404,{}, ["Sorry, dunno what to do about #{req.request_method} #{req.path}"]]
+#    end
+# end
