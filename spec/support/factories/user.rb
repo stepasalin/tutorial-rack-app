@@ -16,4 +16,14 @@ class UserFactory
              gender || random_user_gender,
              age || random_age_in_seconds
   end
+
+  def self.generate_invalid_user(name: nil, gender: nil, age: nil)
+    User.new name || random_string(31),
+             gender || random_string.to_sym,
+             age || -random_age_in_seconds
+  end
+
+  def self.get_user_from_redis(user)
+    User.find_by_name(user.name)
+  end      
 end
