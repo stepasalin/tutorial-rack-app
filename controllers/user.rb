@@ -1,4 +1,5 @@
 require_relative '../models/user'
+require_relative '../views/user'
 
 class UserController
   attr_accessor :request
@@ -17,6 +18,12 @@ class UserController
   def get_user
     user_name = request.path.gsub('/user/data/','')
     get_user_response(user_name)
+  end
+
+
+  def get_html
+    user_name = request.path.gsub('/user/html/', '')
+    get_user_html_response(user_name)
   end
 
 
@@ -49,6 +56,17 @@ class UserController
     begin
       [200, {}, [User.find(user_name).to_json]]
     rescue KeyExistingdError
+      [404, {}, ["The key '#{user_name}' is not exist"]]
+    rescue UserInvalidError
+      [422, {}, errors]
+    end
+  end
+
+
+  def get_user_html_response(user_name)
+    begin
+      [200, {}, [UserView.new(User.find(user_name)).generate_html]]
+        rescue KeyExistingdError
       [404, {}, ["The key '#{user_name}' is not exist"]]
     rescue UserInvalidError
       [422, {}, errors]
