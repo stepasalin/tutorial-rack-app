@@ -66,7 +66,7 @@ class UserController
   def get_user_html_response(user_name)
     begin
       [200, {}, [UserView.new(User.find(user_name)).generate_html]]
-        rescue KeyExistingdError
+    rescue KeyExistingdError
       [404, {}, ["The key '#{user_name}' is not exist"]]
     rescue UserInvalidError
       [422, {}, errors]

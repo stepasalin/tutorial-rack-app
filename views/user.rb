@@ -1,5 +1,5 @@
 
-# На вход класса Юзер 
+# На вход класса Юзер
 class UserView
 
   def initialize(user)
@@ -10,6 +10,7 @@ class UserView
     %{
     <html>
       <head>
+        <title>#{@user.name} page</title>
       </head>
       <body style='background-color: #{user_gender_background_color(@user.gender)}'>
         <h3>Hello #{@user.name}.</h3>
@@ -27,7 +28,7 @@ class UserView
     elsif user_gender == :f
       'woman'
     else
-    'just a nice person'
+      'just a nice person'
     end
   end
 
