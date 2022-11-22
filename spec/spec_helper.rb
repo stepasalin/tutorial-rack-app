@@ -1,6 +1,13 @@
+class Environment
+  def initialize(app)
+    @app = app
+  end
 
-env = {
-        "REQUEST_METHOD" => "POST",
-        "PATH_INFO" => "/user/data",
-        'rack.input' => StringIO.new(req_body)
-      }
+  def simulate_request(method, path, body)
+    @app.call({
+      "REQUEST_METHOD" => method,
+      "PATH_INFO" => path,
+      'rack.input' => StringIO.new(body)
+    })
+  end
+end

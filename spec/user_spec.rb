@@ -7,32 +7,30 @@ require_relative 'generator_helper'
 RSpec.describe UserController do
   let(:app) { Application.new }
   let(:user) { UserGenerator.new }
-  #let(:environment) { Environment.new(app) }
+  let(:environment) { Environment.new(app) }
 
   before(:example) do
     REDIS_CONNECTION.flushall
   end
 
-  # after(:all) { User.find(req_body[:name]).delete }
+  # after(:all) { User.delete_user(user.name) } # todo
 
   context 'user validation' do
     it 'creates new user' do
       # unique data has to be generated each time
       req_body = user.user_data
       # написать helper что будет принимать 4 аргумента и генерить response
-      # resp = environment.perform_request('POST', '/path', req_body)
+      resp = environment.simulate_request('POST', '/user/data', req_body)
 
-      resp = app.call env
+      response = ApplicationResponse.new(resp)
       # [code, headers, [content]]
       # response parses needed
-      resp_status = resp[0]
-      resp_body = resp[2][0]
 
-      expect(resp_status).to eq 201
-      expect(resp_body).to eq req_body
+      expect(response.status).to eq 201
+      expect(response.body).to eq req_body
 
       # has to be smth like expect { User.find(...) }.to eq(..)
-      expect { User.find(req_body[:name]) }.to req_body.to_s
+      expect { User.find(user.name) }.to eq(req_body)
 
       # сгенерить данные
       # послать запрос
