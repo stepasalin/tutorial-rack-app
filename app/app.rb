@@ -8,7 +8,7 @@ class Application
   def call(env)
     req = Rack::Request.new(env)
 
-    binding.pry
+    #binding.pry
     if req.post? && req.path == "/user/data"
       UserController.new(req).create_user
     elsif req.get? && req.path.start_with?('/user/data/')
