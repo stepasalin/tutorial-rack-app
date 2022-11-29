@@ -15,6 +15,7 @@ class ApplicationResponse
 end
 
 
+
 class Environment
   def initialize(app)
     @app = app

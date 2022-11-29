@@ -71,7 +71,6 @@ class User
 
 
   def update(user_name)
-
     if !REDIS_CONNECTION.get(user_name)
       raise KeyExistingdError
     elsif user_name != @name
@@ -82,15 +81,20 @@ class User
       REDIS_CONNECTION.set(user_name, to_json)
       to_json
     end
-
   end
+
 
   def to_h
     {"name"=>@name, "gender"=>@gender, "age"=>@age}
   end
 
+
   def to_json
     to_h.to_json
   end
 
+
+  def ==(other)
+    @age == other.age && @gender == other.gender && @name == other.name
+  end
 end
