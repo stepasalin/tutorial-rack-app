@@ -1,10 +1,10 @@
 require_relative '../models/user'
 
 class UserGenerator
-    def self.generate(*name)
-    user_name = name[0] || Array.new(rand(1..30)) { [*"A".."Z", *"a".."z", *"0".."9"].sample }.join
-    user_gender = [:m, :f, :nb].sample
-    user_age = rand(1..3153600000)
+    def self.generate(name: nil, age: nil, gender: nil)
+    user_name = name || Array.new(rand(1..30)) { [*"A".."Z", *"a".."z", *"0".."9"].sample }.join
+    user_gender = gender || [:m, :f, :nb].sample
+    user_age = age || rand(1..3153600000)
 
     random_user_params = {"name" => user_name, "gender" => user_gender, "age" => user_age}
 
@@ -12,8 +12,8 @@ class UserGenerator
   end
 
 
-  def self.create
-    user = generate
+  def self.create(name: nil, age: nil, gender: nil)
+    user = generate(name:, age:, gender:)
     user.save
     user
   end
