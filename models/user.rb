@@ -30,7 +30,7 @@ class User
     end
 
     unless @age.is_a?(Integer) && @age.positive?
-      @errors << "Error of age '#{@age}'. Age must be digits only."
+      @errors << "Error of age '#{@age}'. Age must be positive digits only."
     end
 
     @errors.empty?

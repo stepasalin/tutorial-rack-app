@@ -49,13 +49,11 @@ RSpec.describe UserController do
 
     it 'updates an existing user' do
       user_in_db = UserGenerator.create gender: :m, age: 123
-
       new_user_data = UserGenerator.generate name: user_in_db.name, gender: :f, age: 654
       req_body = new_user_data.to_json
 
       response = environment.simulate_request("PUT", "/user/data/#{user_in_db.name}", req_body)
 
-      # при помощи именованных аргументов хардкодить параметры юзера
       # todo обсудить как мы используем захардкодженные данные
 
       expect(response.status).to eq 200
@@ -89,18 +87,76 @@ RSpec.describe UserController do
     # end
 
 
-    # it 'checks a forbidden symbol in user name' do
-    #   user = UserGenerator.generate("")
-    #   req_body = user.to_json
-    #   response = environment.simulate_request('POST', '/user/data', req_body)
+    it 'checks a forbidden symbol in a user name' do
+      user = UserGenerator.forbidden_name_symbol
+      req_body = user.to_json
+      response = environment.simulate_request('POST', '/user/data', req_body)
 
-    #   expect(response.status).to eq 422
-    #   expect(response.body).to eq "Error of name symbols '#{user.name}'. Accepted only leters and digits. "
+      expect(response.status).to eq 422
+      expect(response.body).to eq "Error of name symbols '#{user.name}'. Accepted only leters and digits. "
 
-    #   expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
-    # end
-    # [*" ".."/", *"[".."'", *":".."?", *"{".."~"].sample
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+    end
 
+
+    it 'checks an empty user gender' do
+      user = UserGenerator.generate(gender: '')
+      req_body = user.to_json
+      response = environment.simulate_request('POST', '/user/data', req_body)
+
+      expect(response.status).to eq 422
+      expect(response.body).to eq "Error of gender '#{user.gender}'. Correct genders are '#{:m}', '#{:f}' or '#{:nb}'. "
+
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+    end
+
+
+    it 'checks a wrong user gender' do
+      user = UserGenerator.wrong_user_gender
+      req_body = user.to_json
+      response = environment.simulate_request('POST', '/user/data', req_body)
+
+      expect(response.status).to eq 422
+      expect(response.body).to eq "Error of gender '#{user.gender}'. Correct genders are '#{:m}', '#{:f}' or '#{:nb}'. "
+
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+    end
+
+
+    it 'checks an empty user age' do
+      user = UserGenerator.generate(age: '')
+      req_body = user.to_json
+      response = environment.simulate_request('POST', '/user/data', req_body)
+
+      expect(response.status).to eq 422
+      expect(response.body).to eq "Error of age '#{user.age}'. Age must be positive digits only."
+
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+    end
+
+
+    it 'checks a negative user age' do
+      user = UserGenerator.generate(age: rand(-1..0))
+      req_body = user.to_json
+      response = environment.simulate_request('POST', '/user/data', req_body)
+
+      expect(response.status).to eq 422
+      expect(response.body).to eq "Error of age '#{user.age}'. Age must be positive digits only."
+
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+    end
+
+
+    it 'checks not digits in a user age' do
+      user = UserGenerator.generate(age: " ")
+      req_body = user.to_json
+      response = environment.simulate_request('POST', '/user/data', req_body)
+
+      expect(response.status).to eq 422
+      expect(response.body).to eq "Error of age '#{user.age}'. Age must be positive digits only."
+
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+    end
       # сгенерить данные
       # послать запрос
       # проверить код ответа

@@ -23,6 +23,19 @@ class UserView
 
 
   def user_gender_output(user_gender)
+    vocabulary = {                      # зачем?
+      :m => 'Man',
+      :f => 'Woman',
+      :nb => 'Just a nice person'
+    }
+    mapping = {
+      m: 'Man',
+      f: 'Woman',
+      nb: 'Just a nice person'
+    }
+
+    mapping[user_gender]
+
     if user_gender == :m
       'man'
     elsif user_gender == :f
