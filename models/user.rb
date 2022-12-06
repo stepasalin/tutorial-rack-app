@@ -21,8 +21,8 @@ class User
 
   def valid?
     @errors = []
-    unless @name =~ /^[\w\d]+$/
-      @errors << "Error of name symbols '#{@name}'. Accepted only leters and digits. "
+    unless @name =~ /^[\w\d]+$/ && @name.length <= 30
+      @errors << "Error of name symbols '#{@name}'. Accepted only leters and digits and not longer 30 symbols. "
     end
 
     unless AVAILABLE_GENDER.include?(@gender)

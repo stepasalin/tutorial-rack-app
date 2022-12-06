@@ -63,37 +63,38 @@ RSpec.describe UserController do
     end
 
 
-    it 'checks empty name for a new user' do
-      user = UserGenerator.generate(name: '')
-      req_body = user.to_json
+    it 'does not allow empty name for a new user' do
+      empty_name_user = UserGenerator.generate(name: '')
+      req_body = empty_name_user.to_json
       response = environment.simulate_request('POST', '/user/data', req_body)
 
       expect(response.status).to eq 422
-      expect(response.body).to eq "Error of name symbols '#{user.name}'. Accepted only leters and digits. "
+      expect(response.body).to eq "Error of name symbols '#{empty_name_user.name}'. Accepted only leters and digits and not longer 30 symbols. "
 
-      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(empty_name_user.name).to_json }.to raise_error KeyExistingdError
     end
 
 
-    # it 'checks overlong name for a new user' do          # does not work, doesn't have such limitation in code
-    #   user = UserGenerator.overlong_user_name
-    #   req_body = user.to_json
-    #   response = environment.simulate_request('POST', '/user/data', req_body)
+    it 'does not allow overlong name for a new user' do
+      long_name_user = UserGenerator.generate [:overlong_name]
+      # long_name_user = UserGenerator.overlong_user_name
+      req_body = long_name_user.to_json
+      response = environment.simulate_request('POST', '/user/data', req_body)
 
-    #   expect(response.status).to eq 422
-    #   expect(response.body).to eq "Error of name symbols '#{user.name}'. Accepted only leters and digits. "
+      expect(response.status).to eq 422
+      expect(response.body).to eq "Error of name symbols '#{long_name_user.name}'. Accepted only leters and digits and not longer 30 symbols. "
 
-    #   expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
-    # end
+      expect { User.find(long_name_user.name).to_json }.to raise_error KeyExistingdError
+    end
 
 
     it 'checks a forbidden symbol in a user name' do
-      user = UserGenerator.forbidden_name_symbol
+      user = UserGenerator.generate [:forbidden_name_symbol]
       req_body = user.to_json
       response = environment.simulate_request('POST', '/user/data', req_body)
 
       expect(response.status).to eq 422
-      expect(response.body).to eq "Error of name symbols '#{user.name}'. Accepted only leters and digits. "
+      expect(response.body).to eq "Error of name symbols '#{user.name}'. Accepted only leters and digits and not longer 30 symbols. "
 
       expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
     end
@@ -112,7 +113,7 @@ RSpec.describe UserController do
 
 
     it 'checks a wrong user gender' do
-      user = UserGenerator.wrong_user_gender
+      user = UserGenerator.generate [:wrong_user_gender]
       req_body = user.to_json
       response = environment.simulate_request('POST', '/user/data', req_body)
 
