@@ -55,7 +55,7 @@ class UserController
   def get_user_response(user_name)
     begin
       [200, {}, [User.find(user_name).to_json]]
-    rescue KeyExistingdError
+    rescue KeyExistingError
       [404, {}, ["The key '#{user_name}' is not exist"]]
     rescue UserInvalidError
       [422, {}, errors]
@@ -66,7 +66,7 @@ class UserController
   def get_user_html_response(user_name)
     begin
       [200, {}, [UserView.new(User.find(user_name)).generate_html]]
-    rescue KeyExistingdError
+    rescue KeyExistingError
       [404, {}, ["The key '#{user_name}' is not exist"]]
     rescue UserInvalidError
       [422, {}, errors]
@@ -77,7 +77,7 @@ class UserController
   def delete_user_response(user_name)
     begin
       [202, {}, [User.delete(user_name)]]
-    rescue KeyExistingdError
+    rescue KeyExistingError
       [404, {}, ["The key '#{user_name}' is not exist"]]
     end
   end
@@ -86,7 +86,7 @@ class UserController
   def update_user_response(user_name, updated_user)
     begin
       [200, {}, [updated_user.update(user_name)]]
-    rescue KeyExistingdError
+    rescue KeyExistingError
       [404, {}, ["The key '#{user_name}' is not exist"]]
     rescue UserNameError
       [422, {}, ["User name cannot be changed"]]

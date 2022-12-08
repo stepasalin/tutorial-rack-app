@@ -2,7 +2,7 @@ require_relative '../helpers/redis_helper'
 
 class UserInvalidError < RuntimeError; end
 class AccessKeyError < RuntimeError; end
-class KeyExistingdError < RuntimeError; end
+class KeyExistingError < RuntimeError; end
 class UserNameError < RuntimeError; end
 
 class User
@@ -50,7 +50,7 @@ class User
 
 
   def self.find(user_name)
-    raise KeyExistingdError if !REDIS_CONNECTION.get(user_name)
+    raise KeyExistingError if !REDIS_CONNECTION.get(user_name)
 
     json_user = REDIS_CONNECTION.get(user_name)
     user_instance = User.new(JSON.parse(json_user))
@@ -63,7 +63,7 @@ class User
 
   def self.delete(user_name)
     user_to_be_deleted = REDIS_CONNECTION.get(user_name)
-    raise KeyExistingdError if !user_to_be_deleted
+    raise KeyExistingError if !user_to_be_deleted
 
     REDIS_CONNECTION.del(user_name)
     user_to_be_deleted
@@ -72,7 +72,7 @@ class User
 
   def update(user_name)
     if !REDIS_CONNECTION.get(user_name)
-      raise KeyExistingdError
+      raise KeyExistingError
     elsif user_name != @name
       raise UserNameError
     elsif @errors.any?

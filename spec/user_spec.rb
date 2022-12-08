@@ -43,7 +43,7 @@ RSpec.describe UserController do
       expect(response.status).to eq 202
       expect(response.body).to eq expected_res_body
 
-      expect { User.find(user.name) }.to raise_error KeyExistingdError
+      expect { User.find(user.name) }.to raise_error KeyExistingError
     end
 
 
@@ -54,12 +54,22 @@ RSpec.describe UserController do
 
       response = environment.simulate_request("PUT", "/user/data/#{user_in_db.name}", req_body)
 
-      # todo обсудить как мы используем захардкодженные данные
-
       expect(response.status).to eq 200
       expect(response.body).to eq req_body
 
       expect(User.find(user_in_db.name)).to eq new_user_data
+    end
+
+
+    it 'cannot update a not existing user' do
+      req_body = generated_user.to_json
+
+      response = environment.simulate_request("PUT", "/user/data/#{generated_user.name}", req_body)
+
+      expect(response.status).to eq 404
+      expect(response.body).to eq "The key '#{generated_user.name}' is not exist"
+
+      expect { User.find(generated_user.name) }.to raise_error KeyExistingError
     end
 
 
@@ -71,20 +81,19 @@ RSpec.describe UserController do
       expect(response.status).to eq 422
       expect(response.body).to eq "Error of name symbols '#{empty_name_user.name}'. Accepted only leters and digits and not longer 30 symbols. "
 
-      expect { User.find(empty_name_user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(empty_name_user.name).to_json }.to raise_error KeyExistingError
     end
 
 
     it 'does not allow overlong name for a new user' do
       long_name_user = UserGenerator.generate [:overlong_name]
-      # long_name_user = UserGenerator.overlong_user_name
       req_body = long_name_user.to_json
       response = environment.simulate_request('POST', '/user/data', req_body)
 
       expect(response.status).to eq 422
       expect(response.body).to eq "Error of name symbols '#{long_name_user.name}'. Accepted only leters and digits and not longer 30 symbols. "
 
-      expect { User.find(long_name_user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(long_name_user.name).to_json }.to raise_error KeyExistingError
     end
 
 
@@ -96,7 +105,7 @@ RSpec.describe UserController do
       expect(response.status).to eq 422
       expect(response.body).to eq "Error of name symbols '#{user.name}'. Accepted only leters and digits and not longer 30 symbols. "
 
-      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingError
     end
 
 
@@ -108,7 +117,7 @@ RSpec.describe UserController do
       expect(response.status).to eq 422
       expect(response.body).to eq "Error of gender '#{user.gender}'. Correct genders are '#{:m}', '#{:f}' or '#{:nb}'. "
 
-      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingError
     end
 
 
@@ -120,7 +129,7 @@ RSpec.describe UserController do
       expect(response.status).to eq 422
       expect(response.body).to eq "Error of gender '#{user.gender}'. Correct genders are '#{:m}', '#{:f}' or '#{:nb}'. "
 
-      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingError
     end
 
 
@@ -132,7 +141,7 @@ RSpec.describe UserController do
       expect(response.status).to eq 422
       expect(response.body).to eq "Error of age '#{user.age}'. Age must be positive digits only."
 
-      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingError
     end
 
 
@@ -144,7 +153,7 @@ RSpec.describe UserController do
       expect(response.status).to eq 422
       expect(response.body).to eq "Error of age '#{user.age}'. Age must be positive digits only."
 
-      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingError
     end
 
 
@@ -156,7 +165,7 @@ RSpec.describe UserController do
       expect(response.status).to eq 422
       expect(response.body).to eq "Error of age '#{user.age}'. Age must be positive digits only."
 
-      expect { User.find(user.name).to_json }.to raise_error KeyExistingdError
+      expect { User.find(user.name).to_json }.to raise_error KeyExistingError
     end
       # сгенерить данные
       # послать запрос
