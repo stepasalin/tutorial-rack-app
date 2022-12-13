@@ -19,6 +19,8 @@ class Application
       UserController.new(req).update_user
     elsif req.get? && req.path.start_with?('/user/html/')
       UserController.new(req).get_html
+    elsif req.get? && req.path == '/all_user_names'
+      UserController.new(req).get_all_user_names
     end
   end
 end

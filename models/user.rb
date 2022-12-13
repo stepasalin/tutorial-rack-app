@@ -13,7 +13,7 @@ class User
   def initialize(user_params)
     @name = user_params["name"]
     @gender = user_params["gender"].to_sym
-    @age = user_params["age"]
+    @age = user_params["age"].to_i
 
     valid?
   end
@@ -96,5 +96,9 @@ class User
 
   def ==(other)
     @age == other.age && @gender == other.gender && @name == other.name
+  end
+
+  def self.all_user_names
+    REDIS_CONNECTION.keys('*')
   end
 end

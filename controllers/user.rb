@@ -95,4 +95,8 @@ class UserController
     end
   end
 
+  def get_all_user_names
+    [200,{},[User.all_user_names.to_json]]
+  end
+
 end

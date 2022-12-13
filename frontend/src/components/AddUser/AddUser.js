@@ -53,7 +53,7 @@ export default function AddUser() {
       "gender":`${gender}`,
       "age":`${age}`
     }
-    fetch('/api/new_user',
+    fetch('/user/data',
       {
         method: 'post',
         body: JSON.stringify(body)
