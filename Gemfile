@@ -1,10 +1,17 @@
+# frozen_string_literal: true
+
 ruby '>= 2.7.4'
 
 source 'https://rubygems.org'
-gem "rack", "= 3.0.0.beta1"
+gem 'rack', '= 3.0.0.beta1'
 
-gem "rackup", "~> 0.2.2"
-gem "pry"
+gem 'pry'
+gem 'rackup', '~> 0.2.2'
 
-gem "redis", "~> 4.7"
-gem 'rspec'
+gem 'dotenv-rails'
+gem 'redis', '~> 4.7'
+gem 'rspec', '~> 3.11'
+gem 'rubocop-taxdome', group: 'development', git: 'https://gitlab.com/taxdome/forks/rubocop-taxdome.git', branch: 'main'
+gem 'capybara'
+gem 'webdrivers'
+gem 'site_prism'
