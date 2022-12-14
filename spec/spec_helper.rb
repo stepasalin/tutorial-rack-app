@@ -1,7 +1,6 @@
 require 'capybara/rspec'
 require 'capybara/dsl'
 require 'webdrivers/chromedriver'
-require_relative 'features/pages/main_page.rb'
 require_relative './generator_helper.rb'
 
 RSpec.configure do |config|
