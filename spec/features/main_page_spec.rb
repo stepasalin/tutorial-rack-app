@@ -6,11 +6,11 @@ describe 'Base Page' do
     visit 'http://localhost:3000/'
     user_params = UserGenerator.generate
 
-    create_section = find('div#root > div:nth-of-type(2)')
+    create_section = find('#root > div:nth-of-type(2)')
     name_input = create_section.find('#name')
     gender_input = create_section.find('#gender')
     age_input = create_section.find('#age')
-    create_button = create_section.find(:button, 'Create User')
+    create_button = create_section.find(:button, 'Create User') # Capybara cheat sheet    
 
     name_input.set user_params.name
     age_input.set user_params.age
