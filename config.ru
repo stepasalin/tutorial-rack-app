@@ -4,6 +4,7 @@ require 'rack'
 require 'pry'
 require 'json'
 require 'redis'
+require_relative 'user'
 require_relative 'helpers/redis_helper'
 
 run do |env|
@@ -20,8 +21,9 @@ run do |env|
   elsif req.post? && req.path.start_with?('/user/new/')
     original_req_body = req.body.read
     parsed_req_body = JSON.parse(original_req_body)
-    value = REDIS_CONNECTION.set(parsed_req_body["name"],original_req_body) || ''
-    [201, {}, ["new user is created! The nickname is #{req_body["name"]} and his age is #{req_body["age"]}"]]
+    user = User.new(parsed_req_body['name'], parsed_req_body['age'], parsed_req_body['gender'])
+    user.full_info = original_req_body
+    user.validate
   else
     [404, {}, ["Sorry, dunno what to do about #{req.request_method} #{req.path}"]]
   end
@@ -33,10 +35,9 @@ end
 # то этот JSON будет записан в redis по ключу, переданному в поле name
 # REDIS_CONNECTION.set(key, value)
 
-
 # написать маршрут, который по POST /new_user принимает JSON
 # и если все валидации проходят, то кладет его в redis по ключу name
-# если валидации не проходят, то необходимо вернуть http-статус 422 
+# если валидации не проходят, то необходимо вернуть http-статус 422
 # и все человеко-читаемым текстом
 # если валидации проходят, но ключ уже занят,
 # вернуть 409 и объяснение, что ключ уже занят
