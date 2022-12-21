@@ -24,10 +24,6 @@ class User
     %i[m f nb].include?(@gender)
   end
 
-  def put_user_to_redis
-    REDIS_CONNECTION.set(@name, @full_info)
-  end
-
   def check_user_input_validity
     unless name_valid?
       @validity_errors << "Invalid name. Must contain only latin alphabet characters, numbers and have length from 1 to 30 chars. No spaces allowed \n"
@@ -39,15 +35,27 @@ class User
     false
   end
 
+  def put_user_to_redis
+    REDIS_CONNECTION.set(@name, @full_info)
+  end
+
   def already_created?
     REDIS_CONNECTION.exists(@name) == 1
   end
 
   def validate
-    return [422, {}, @validity_errors] if check_user_input_validity == false
-    return [409, {}, ['User is already created']] if already_created?
+    response = Response.new
+    if check_user_input_validity == false
+      response.invalid_input(@validity_errors)
+      return response.answer
+    end
+    if already_created?
+      response.duplicated_user
+      return response.answer
+    end
 
     put_user_to_redis
-    [201, {}, ['new user is created!']]
+    response.user_is_created
+    response.answer
   end
 end

@@ -5,6 +5,7 @@ require 'pry'
 require 'json'
 require 'redis'
 require_relative 'user'
+require_relative 'responser'
 require_relative 'helpers/redis_helper'
 
 run do |env|
