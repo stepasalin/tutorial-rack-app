@@ -6,6 +6,7 @@ class User
     @age = age
     @gender = gender.to_sym
     @validity_errors = []
+    @full_info = {}
     check_user_input_validity
   end
 
@@ -27,8 +28,17 @@ class User
     end
     @validity_errors << "Invalid age. Must be integral number not less than 0. \n" unless age_valid?
     @validity_errors << "Invalid gender. Must be Male, Female or Nonbinary \n" unless gender_valid?
-    return true if @validity_errors.empty?
+    @validity_errors.empty?
+  end
 
-    false
+  def already_created?
+    REDIS_CONNECTION.exists(@name) == 1
+  end
+
+  def save
+    return [422, {}, @validity_errors] if check_user_input_validity == false
+    return [409, {}, ['User is already created']] if already_created?
+
+    REDIS_CONNECTION.set(@name, @full_info)
   end
 end
