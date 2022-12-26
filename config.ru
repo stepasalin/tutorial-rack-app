@@ -4,8 +4,8 @@ require 'rack'
 require 'pry'
 require 'json'
 require 'redis'
-require_relative 'user'
-require_relative 'responser'
+require_relative 'models/user'
+require_relative 'exceptions/user_exceptions'
 require_relative 'helpers/redis_helper'
 
 run do |env|
@@ -24,7 +24,13 @@ run do |env|
     parsed_req_body = JSON.parse(original_req_body)
     user = User.new(parsed_req_body['name'], parsed_req_body['age'], parsed_req_body['gender'])
     user.full_info = original_req_body
-    user.validate
+    user.create
+  elsif req.post? && req.path.start_with?('/user/update/')
+    original_req_body = req.body.read
+    parsed_req_body = JSON.parse(original_req_body)
+    user = User.new(parsed_req_body['name'], parsed_req_body['age'], parsed_req_body['gender'])
+    user.full_info = original_req_body
+    user.update
   else
     [404, {}, ["Sorry, dunno what to do about #{req.request_method} #{req.path}"]]
   end
@@ -47,3 +53,5 @@ end
 # name может быть строкой от 1 до 30 символов латиницей без пробелов
 # gender всего 3 возможных значения :f, :m, :nb
 # age - integer от 0 до скольких угодно. Возраст человека В СЕКУНДАХ
+
+# Update user with Put request
