@@ -1,14 +1,20 @@
 # frozen_string_literal: true
 
+class InvalidInputError < StandardError; end
+class DuplicatedUserError < StandardError; end
+class UserEntityIsNotFound < StandardError; end
+
 class User
   attr_writer :full_info
+  attr_reader :errors
 
   def initialize(name, age, gender)
     @name = name.downcase
     @age = age
     @gender = gender.to_sym
     @full_info = {}
-    @validity_errors = []
+    @errors = []
+    valid?
   end
 
   def name_valid?
@@ -24,57 +30,45 @@ class User
     %i[m f nb].include?(@gender)
   end
 
-  def check_user_input_validity
+  def valid?
+    @errors = []
+
     unless name_valid?
-      @validity_errors << "Invalid name. Must contain only latin alphabet characters, numbers and have length from 1 to 30 chars. No spaces allowed. \n"
+      @errors << "Invalid name. Must contain only latin alphabet characters, numbers and have length from 1 to 30 chars. No spaces allowed. \n"
     end
-    @validity_errors << "Invalid age. Must be integral number not less than 0. \n" unless age_valid?
-    @validity_errors << "Invalid gender. Must be Male, Female or Nonbinary \n" unless gender_valid?
-    @validity_errors.empty?
+    @errors << "Invalid age. Must be integral number not less than 0. \n" unless age_valid?
+    @errors << "Invalid gender. Must be Male, Female or Nonbinary \n" unless gender_valid?
+
+    @errors.empty?
   end
 
-  def already_created?
+  def name_taken?
     REDIS_CONNECTION.exists(@name) == 1
   end
 
-  def save_to_db
+  def save
     REDIS_CONNECTION.set(@name, @full_info)
   end
 
-  def find_user_in_db(key)
-    REDIS_CONNECTION.get(key) 
+  def find(key)
+    REDIS_CONNECTION.get(key)
   end
 
-  def raise_common_exception_to_user_creation_errors
-    raise InvalidInputError if check_user_input_validity == false
-    raise DuplicatedUserError if already_created?
-  end
-
-  def raise_common_exception_to_user_update_errors
-    raise InvalidInputError if check_user_input_validity == false
-    raise UserEntityIsNotFound unless already_created?
+  def raiseFieldValidityException
+    raise InvalidInputError unless valid?
   end
 
   def create
-    raise_common_exception_to_user_creation_errors
+    raiseFieldValidityException
+    raise DuplicatedUserError if name_taken?
 
-    save_to_db
-    [201, {}, ['new user is created!']]
-  rescue InvalidInputError
-    [422, {}, @validity_errors]
-  rescue DuplicatedUserError
-    [409, {}, ['User is already created']]
+    save
   end
 
   def update
+    raiseFieldValidityException
+    raise UserEntityIsNotFound unless name_taken?
 
-    raise_common_exception_to_user_update_errors
-
-    save_to_db
-    [200, {}, ['User is updated!']]
-  rescue InvalidInputError
-    [422, {}, @validity_errors]
-  rescue UserEntityIsNotFound
-    [404, {}, ['User is not found']]
+    save
   end
 end

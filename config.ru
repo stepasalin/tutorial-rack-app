@@ -5,8 +5,8 @@ require 'pry'
 require 'json'
 require 'redis'
 require_relative 'models/user'
-require_relative 'exceptions/user_exceptions'
 require_relative 'helpers/redis_helper'
+require_relative 'controllers/user'
 
 run do |env|
   req = Rack::Request.new(env)
@@ -20,38 +20,12 @@ run do |env|
     value = REDIS_CONNECTION.get(key) || ''
     [200, {}, [value]]
   elsif req.post? && req.path.start_with?('/user/new/')
-    original_req_body = req.body.read
-    parsed_req_body = JSON.parse(original_req_body)
-    user = User.new(parsed_req_body['name'], parsed_req_body['age'], parsed_req_body['gender'])
-    user.full_info = original_req_body
-    user.create
+    controller = UserController.new(req.body)
+    controller.send_create_response
   elsif req.post? && req.path.start_with?('/user/update/')
-    original_req_body = req.body.read
-    parsed_req_body = JSON.parse(original_req_body)
-    user = User.new(parsed_req_body['name'], parsed_req_body['age'], parsed_req_body['gender'])
-    user.full_info = original_req_body
-    user.update
+    controller = UserController.new(req.body)
+    controller.send_update_response
   else
     [404, {}, ["Sorry, dunno what to do about #{req.request_method} #{req.path}"]]
   end
 end
-
-# Задача #0
-# реализовать добавление Юзера через POST запрос,
-# т.е если прислать POST на '/api/user/new' с JSON в теле,
-# то этот JSON будет записан в redis по ключу, переданному в поле name
-# REDIS_CONNECTION.set(key, value)
-
-# написать маршрут, который по POST /new_user принимает JSON
-# и если все валидации проходят, то кладет его в redis по ключу name
-# если валидации не проходят, то необходимо вернуть http-статус 422
-# и все человеко-читаемым текстом
-# если валидации проходят, но ключ уже занят,
-# вернуть 409 и объяснение, что ключ уже занят
-
-# Валидации на User
-# name может быть строкой от 1 до 30 символов латиницей без пробелов
-# gender всего 3 возможных значения :f, :m, :nb
-# age - integer от 0 до скольких угодно. Возраст человека В СЕКУНДАХ
-
-# Update user with Put request
