@@ -1,9 +1,23 @@
 # frozen_string_literal: true
 
 class UserController
-  def initialize(body)
-    @original_req_body = body.read
+  def initialize(request)
+    @req = request
+  end
+
+  def execute_request
+    return unless @req.post?
+
+    parse_body
+    set_user_info
+  end
+
+  def parse_body
+    @original_req_body = @req.body.read
     @parsed_req_body = JSON.parse(@original_req_body)
+  end
+
+  def set_user_info
     @user = User.new(@parsed_req_body['name'], @parsed_req_body['age'], @parsed_req_body['gender'])
     @user.full_info = @original_req_body
   end

@@ -10,6 +10,7 @@ require_relative 'controllers/user'
 
 run do |env|
   req = Rack::Request.new(env)
+  controller = UserController.new(req)
   if req.post? && req.path == '/epic-post'
     req_body = JSON.parse(req.body.read)
     [200, {}, ["epic post detected! The body is #{req_body}"]]
@@ -20,10 +21,10 @@ run do |env|
     value = REDIS_CONNECTION.get(key) || ''
     [200, {}, [value]]
   elsif req.post? && req.path.start_with?('/user/new/')
-    controller = UserController.new(req.body)
+    controller.execute_request
     controller.send_create_response
   elsif req.post? && req.path.start_with?('/user/update/')
-    controller = UserController.new(req.body)
+    controller.execute_request
     controller.send_update_response
   else
     [404, {}, ["Sorry, dunno what to do about #{req.request_method} #{req.path}"]]
