@@ -21,9 +21,13 @@ run do |env|
     value = REDIS_CONNECTION.get(key) || ''
     [200, {}, [value]]
   elsif req.post? && req.path.start_with?('/user/new')
-    controller.send_create_response
+    controller.create
   elsif req.post? && req.path.start_with?('/user/update')
-    controller.send_update_response
+    controller.update
+  elsif req.delete? && req.path.start_with?('/user')
+    controller.delete
+  elsif req.get? && req.path.start_with?('/users')
+    controller.all_users_list
   else
     [404, {}, ["Sorry, dunno what to do about #{req.request_method} #{req.path}"]]
   end

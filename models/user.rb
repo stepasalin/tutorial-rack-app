@@ -5,16 +5,22 @@ class DuplicatedUserError < StandardError; end
 class UserEntityIsNotFound < StandardError; end
 
 class User
-  attr_writer :full_info
   attr_reader :errors
 
-  def initialize(name, age, gender)
-    @name = name.downcase
-    @age = age
-    @gender = gender.to_sym
-    @full_info = {}
+  def initialize(body)
+    @name = body['name'].downcase
+    @age = body['age']
+    @gender = body['gender'].to_sym
     @errors = []
     valid?
+  end
+
+  def to_hash
+    { 'name' => @name, 'age' => @age, 'gender' => @gender }
+  end
+
+  def to_json(*_args)
+    to_hash.to_json
   end
 
   def name_valid?
@@ -22,7 +28,6 @@ class User
   end
 
   def age_valid?
-    # How to deal if we have chars in integer field?
     @age.instance_of?(Integer) && @age.positive?
   end
 
@@ -42,16 +47,19 @@ class User
     @errors.empty?
   end
 
-  def name_taken?
-    REDIS_CONNECTION.exists(@name) == 1
+  def self.find(name)
+    user = User.new(JSON.parse(REDIS_CONNECTION.get(name)))
+    raise UserEntityIsNotFound unless user
+
+    user
   end
 
   def save
-    REDIS_CONNECTION.set(@name, @full_info)
+    REDIS_CONNECTION.set(@name, to_hash)
   end
 
-  def find(key)
-    REDIS_CONNECTION.get(key)
+  def name_taken?
+    REDIS_CONNECTION.exists(@name) == 1
   end
 
   def raiseFieldValidityException
@@ -70,5 +78,16 @@ class User
     raise UserEntityIsNotFound unless name_taken?
 
     save
+  end
+
+  def self.delete(name)
+    user = REDIS_CONNECTION.get(name)
+    raise UserEntityIsNotFound unless user
+
+    REDIS_CONNECTION.del(name)
+  end
+
+  def self.list
+    REDIS_CONNECTION.keys('*')
   end
 end
