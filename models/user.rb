@@ -48,14 +48,12 @@ class User
   end
 
   def self.find(name)
-    user = User.new(JSON.parse(REDIS_CONNECTION.get(name)))
-    raise UserEntityIsNotFound unless user
-
-    user
+    raise UserEntityIsNotFound unless REDIS_CONNECTION.get(name)
+    User.new(JSON.parse(REDIS_CONNECTION.get(name)))
   end
 
   def save
-    REDIS_CONNECTION.set(@name, to_hash)
+    REDIS_CONNECTION.set(@name, to_json)
   end
 
   def name_taken?
@@ -81,8 +79,7 @@ class User
   end
 
   def self.delete(name)
-    user = REDIS_CONNECTION.get(name)
-    raise UserEntityIsNotFound unless user
+    raise UserEntityIsNotFound unless REDIS_CONNECTION.get(name)
 
     REDIS_CONNECTION.del(name)
   end

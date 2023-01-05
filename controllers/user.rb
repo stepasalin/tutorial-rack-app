@@ -23,7 +23,9 @@ class UserController
 
   def read
     name = @req.path.gsub('/user/', '').downcase
-    User.find(name)
+    [200, {}, [User.find(name).to_json]]
+  rescue UserEntityIsNotFound
+    [404, {}, ['User is not found']]
   end
 
   def update
@@ -39,13 +41,12 @@ class UserController
   def delete
     name = @req.path.gsub('/user/', '').downcase
     User.delete(name)
-    [204, {}, []]
+    [204, {}, ['User is deleted']]
   rescue UserEntityIsNotFound
     [404, {}, ['User is not found']]
   end
 
-  # looks terrible in postman responce. all keys are a one word mess without spaces. How to solve it>?
   def all_users_list
-    [200, {}, User.list]
+    [200, {}, [User.list.to_json]]
   end
 end
