@@ -5,11 +5,11 @@ class DuplicatedUserError < StandardError; end
 class UserEntityIsNotFound < StandardError; end
 
 class User
-  attr_reader :errors
+  attr_reader :errors, :name, :gender, :age
 
   def initialize(body)
     @name = body['name'].downcase
-    @age = body['age']
+    @age = body['age'].to_i
     @gender = body['gender'].to_sym
     @errors = []
     valid?
@@ -49,6 +49,7 @@ class User
 
   def self.find(name)
     raise UserEntityIsNotFound unless REDIS_CONNECTION.get(name)
+
     User.new(JSON.parse(REDIS_CONNECTION.get(name)))
   end
 
@@ -60,19 +61,15 @@ class User
     REDIS_CONNECTION.exists(@name) == 1
   end
 
-  def raiseFieldValidityException
-    raise InvalidInputError unless valid?
-  end
-
   def create
-    raiseFieldValidityException
+    raise InvalidInputError unless valid?
     raise DuplicatedUserError if name_taken?
 
     save
   end
 
-  def update
-    raiseFieldValidityException
+  def overwrite
+    raise InvalidInputError unless valid?
     raise UserEntityIsNotFound unless name_taken?
 
     save

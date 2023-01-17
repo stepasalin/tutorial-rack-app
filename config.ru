@@ -7,6 +7,7 @@ require 'redis'
 require_relative 'models/user'
 require_relative 'helpers/redis_helper'
 require_relative 'controllers/user'
+require_relative 'HTML_Page'
 
 run do |env|
   req = Rack::Request.new(env)

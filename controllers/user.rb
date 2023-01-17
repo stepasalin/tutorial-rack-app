@@ -23,14 +23,14 @@ class UserController
 
   def read
     name = @req.path.gsub('/user/', '').downcase
-    [200, {}, [User.find(name).to_json]]
+    [200, {}, [HTML_Page.new(User.find(name)).create_html]]
   rescue UserEntityIsNotFound
     [404, {}, ['User is not found']]
   end
 
   def update
     set_user_info
-    @user.update
+    @user.overwrite
     [200, {}, ['User is updated!']]
   rescue InvalidInputError
     [422, {}, @user.errors]
