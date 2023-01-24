@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require_relative 'helpers/HTML_page'
-
-class HTML_Page
+class User_view
   def initialize(user)
     @user = user
   end

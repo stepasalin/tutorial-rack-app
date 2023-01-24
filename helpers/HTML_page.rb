@@ -3,9 +3,9 @@
 def convert_to_ymd_format(age_in_seconds)
   return 'undefined age' if age_in_seconds.nil?
 
-  years = (age_in_seconds / 31_536_000).floor
-  months = (age_in_seconds / 2_628_288).floor - (years * 12)
-  days = (age_in_seconds / 86_400).floor - (years * 365) - (months * 12)
+  years, seconds_left = age_in_seconds.divmod(60 * 60 * 24 * 365)
+  months, seconds_left = seconds_left.divmod(60 * 60 * 24 * 30)
+  days = seconds_left / (60 * 60 * 24)
   "#{years} years, #{months} months, #{days} days old"
 end
 

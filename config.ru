@@ -7,15 +7,16 @@ require 'redis'
 require_relative 'models/user'
 require_relative 'helpers/redis_helper'
 require_relative 'controllers/user'
-require_relative 'HTML_Page'
+require_relative 'views/user'
+require_relative 'helpers/HTML_page'
 
 run do |env|
   req = Rack::Request.new(env)
   controller = UserController.new(req)
   if req.post? && req.path.start_with?('/user/new')
     controller.create
-  elsif req.get? && req.path.start_with?('/user')
-    controller.read
+  elsif req.get? && req.path.start_with?('/user/html/')
+    controller.get_user_html
   elsif req.post? && req.path.start_with?('/user/update')
     controller.update
   elsif req.delete? && req.path.start_with?('/user')
