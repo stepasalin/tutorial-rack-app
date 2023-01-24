@@ -9,3 +9,5 @@ gem 'pry'
 gem 'rackup', '~> 0.2.2'
 
 gem 'redis', '~> 4.7'
+
+gem 'rspec'
