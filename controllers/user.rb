@@ -21,9 +21,9 @@ class UserController
     [409, {}, ['User is already created']]
   end
 
-  def get_user_html
+  def user_html
     name = @req.path.gsub('/user/html/', '').downcase
-    [200, {}, [User_view.new(User.find(name)).create_html]]
+    [200, {}, [UserView.new(User.find(name)).create_html]]
   rescue UserEntityIsNotFound
     [404, {}, ['User is not found']]
   end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class User_view
+class UserView
   def initialize(user)
     @user = user
   end
