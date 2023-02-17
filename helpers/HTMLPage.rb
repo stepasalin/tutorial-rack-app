@@ -3,17 +3,21 @@
 def convert_to_ymd_format(age_in_seconds)
   return 'undefined age' if age_in_seconds.nil?
 
-  years, seconds_left = age_in_seconds.divmod(60 * 60 * 24 * 365)
-  months, seconds_left = seconds_left.divmod(60 * 60 * 24 * 30)
-  days = seconds_left / (60 * 60 * 24)
+  age = Time.at age_in_seconds
+  zero_time = Time.at 0
+
+  years = age.year - zero_time.year
+  months = age.month - zero_time.month
+  days = age.day - zero_time.day
+
   "#{years} years, #{months} months, #{days} days old"
 end
 
-def set_page_color
-  genders = {
+def page_color(user_gender)
+  colors = {
     m: 'DeepSkyBlue',
     f: 'DeepPink',
     nb: 'Lavender'
   }
-  genders[@user.gender]
+  colors[user_gender]
 end
