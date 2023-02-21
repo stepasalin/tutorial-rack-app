@@ -8,7 +8,7 @@ require_relative 'models/user'
 require_relative 'helpers/redis_helper'
 require_relative 'controllers/user'
 require_relative 'views/user'
-require_relative 'helpers/HTMLPage'
+require_relative 'helpers/html_page'
 
 class Application
   def call(env)

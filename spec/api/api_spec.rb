@@ -3,8 +3,8 @@
 require_relative '../../app'
 require_relative '../../helpers/spec/api/request'
 require_relative '../../helpers/spec/api/response'
-require_relative '../../helpers/spec/api/TestUser'
-require_relative '../../helpers/HTMLPage'
+require_relative '../../helpers/spec/api/test_user'
+require_relative '../../helpers/html_page'
 
 describe 'API' do
   let(:app) { Application.new }
@@ -201,16 +201,13 @@ describe 'API' do
 
   it 'gets all users' do
     users_num = rand(100..500)
-    (users_num - 1).times do
+    users_num.times do
       TestUser.save
     end
-    user = TestUser.save
     response = Response.new(app.call(request('GET', '/get_users', '')))
 
     expect(response.code).to eq(200)
+    expect(response.body.gsub(',', ', ')).to eq(REDIS_CONNECTION.keys('*').to_s)
     expect(response.body.split(',').count).to eq(users_num)
-    expect(response.body[user.name]).to eq(user.name)
-
-    # check EVERY User in list
   end
 end
