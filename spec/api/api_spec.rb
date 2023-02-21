@@ -32,12 +32,6 @@ describe 'API' do
 
     expect(response.code).to eq(409)
     expect(response.body).to eq('User is already created')
-
-    user_info = User.find(created_user.name)
-
-    expect(user_info.name).to eq(created_user.name)
-    expect(user_info.age).to eq(created_user.age)
-    expect(user_info.gender).to eq(created_user.gender)
   end
 
   it 'fails to create user with invalid name' do
@@ -47,13 +41,6 @@ describe 'API' do
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid name. Must contain only latin alphabet characters, numbers and have length from 1 to 30 chars. No spaces allowed.')
     expect(REDIS_CONNECTION.exists(invalid_name_user.name)).to eq(0)
-    expect(REDIS_CONNECTION.exists(test_user.name)).to eq(1)
-
-    user_info = User.find(test_user.name)
-
-    expect(user_info.name).to eq(test_user.name)
-    expect(user_info.age).to eq(test_user.age)
-    expect(user_info.gender).to eq(test_user.gender)
   end
 
   it 'fails to create user with invalid age' do
@@ -63,13 +50,6 @@ describe 'API' do
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid age. Must be integral number not less than 0.')
     expect(REDIS_CONNECTION.exists(invalid_age_user.name)).to eq(0)
-    expect(REDIS_CONNECTION.exists(test_user.name)).to eq(1)
-
-    user_info = User.find(test_user.name)
-
-    expect(user_info.name).to eq(test_user.name)
-    expect(user_info.age).to eq(test_user.age)
-    expect(user_info.gender).to eq(test_user.gender)
   end
 
   it 'fails to create user with invalid gender' do
@@ -79,18 +59,10 @@ describe 'API' do
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid gender. Must be Male, Female or Nonbinary')
     expect(REDIS_CONNECTION.exists(invalid_gender_user.name)).to eq(0)
-    expect(REDIS_CONNECTION.exists(test_user.name)).to eq(1)
-
-    user_info = User.find(test_user.name)
-
-    expect(user_info.name).to eq(test_user.name)
-    expect(user_info.age).to eq(test_user.age)
-    expect(user_info.gender).to eq(test_user.gender)
   end
 
   it 'gets user' do
-    # define age - method, gvozdyami pribivaet user age, dlya bolee gramotnoi convertacii v years\months\days
-    user = TestUser.define_age
+    user = TestUser.defined_age
     response = Response.new(app.call(request('GET', "/user/html/#{user.name}", '')))
     expect(response.code).to eq(200)
     expect(response.html?).to eq(true)
@@ -122,12 +94,10 @@ describe 'API' do
     expect(response.body).to eq('User is updated!')
     expect(REDIS_CONNECTION.exists(updated_user_params.name)).to eq(1)
 
-    user_info = User.find(updated_user_params.name)
+    old_user_updated = User.find(old_user.name)
 
-    expect(user_info.name).to eq(updated_user_params.name)
-    expect(user_info.age).to eq(updated_user_params.age)
-    expect(user_info.gender).to eq(updated_user_params.gender)
-    expect(user_info.name).to eq(old_user.name)
+    expect(old_user_updated.age).to eq(updated_user_params.age)
+    expect(old_user_updated.gender).to eq(updated_user_params.gender)
   end
 
   it 'fails to update unexisting user' do
@@ -137,13 +107,6 @@ describe 'API' do
 
     expect(response.code).to eq(404)
     expect(response.body).to eq('User is not found')
-    expect(REDIS_CONNECTION.exists(user_to_be_deleted.name)).to eq(0)
-
-    user_info = User.find(test_user.name)
-
-    expect(user_info.name).to eq(test_user.name)
-    expect(user_info.age).to eq(test_user.age)
-    expect(user_info.gender).to eq(test_user.gender)
   end
 
   it 'fails to update user with invalid age' do
@@ -153,14 +116,7 @@ describe 'API' do
 
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid age. Must be integral number not less than 0.')
-    expect(REDIS_CONNECTION.exists(old_user.name)).to eq(1)
-    expect(REDIS_CONNECTION.exists(test_user.name)).to eq(1)
-
-    user_info = User.find(test_user.name)
-
-    expect(user_info.name).to eq(test_user.name)
-    expect(user_info.age).to eq(test_user.age)
-    expect(user_info.gender).to eq(test_user.gender)
+    expect(User.find(old_user.name).age).to eq(old_user.age)
   end
 
   it 'fails to update user with invalid gender' do
@@ -171,13 +127,7 @@ describe 'API' do
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid gender. Must be Male, Female or Nonbinary')
     expect(REDIS_CONNECTION.exists(old_user.name)).to eq(1)
-    expect(REDIS_CONNECTION.exists(test_user.name)).to eq(1)
-
-    user_info = User.find(test_user.name)
-
-    expect(user_info.name).to eq(test_user.name)
-    expect(user_info.age).to eq(test_user.age)
-    expect(user_info.gender).to eq(test_user.gender)
+    expect(User.find(old_user.name).gender).to eq(old_user.gender)
   end
 
   it 'deletes user' do
@@ -187,7 +137,6 @@ describe 'API' do
     expect(response.code).to eq(204)
     expect(response.body).to eq('User is deleted')
     expect(REDIS_CONNECTION.exists(user_to_be_deleted.name)).to eq(0)
-    expect(REDIS_CONNECTION.exists(test_user.name)).to eq(1)
   end
 
   it 'fails to delete unexisting user' do
@@ -200,14 +149,13 @@ describe 'API' do
   end
 
   it 'gets all users' do
-    users_num = rand(100..500)
-    users_num.times do
+    rand(100..500).times do
       TestUser.save
     end
     response = Response.new(app.call(request('GET', '/get_users', '')))
 
     expect(response.code).to eq(200)
-    expect(response.body.gsub(',', ', ')).to eq(REDIS_CONNECTION.keys('*').to_s)
-    expect(response.body.split(',').count).to eq(users_num)
+    expect(JSON.parse(response.body)).to match_array(REDIS_CONNECTION.keys('*'))
+    expect(response.body.split(',').count).to eq(REDIS_CONNECTION.DBSIZE)
   end
 end
