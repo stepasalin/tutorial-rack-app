@@ -11,7 +11,7 @@ describe 'API' do
   let(:test_user_data) { TestUser.create }
   let(:test_user) { TestUser.save }
 
-  before(:each) { REDIS_CONNECTION.flushdb }
+  before(:each) { User.delete_all }
 
   it 'creates User' do
     response = Response.new(app.call(request('POST', '/user/new', test_user_data.to_json)))
@@ -40,7 +40,7 @@ describe 'API' do
 
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid name. Must contain only latin alphabet characters, numbers and have length from 1 to 30 chars. No spaces allowed.')
-    expect(REDIS_CONNECTION.exists(invalid_name_user.name)).to eq(0)
+    expect(invalid_name_user.exists?).to eq(false)
   end
 
   it 'fails to create user with invalid age' do
@@ -49,7 +49,7 @@ describe 'API' do
 
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid age. Must be integral number not less than 0.')
-    expect(REDIS_CONNECTION.exists(invalid_age_user.name)).to eq(0)
+    expect(invalid_age_user.exists?).to eq(false)
   end
 
   it 'fails to create user with invalid gender' do
@@ -58,13 +58,13 @@ describe 'API' do
 
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid gender. Must be Male, Female or Nonbinary')
-    expect(REDIS_CONNECTION.exists(invalid_gender_user.name)).to eq(0)
+    expect(invalid_gender_user.exists?).to eq(false)
   end
 
   it 'gets user' do
     age = 1_000_000_000
     gender = :m
-    expected_background_color = 'blue'
+    expected_background_color = 'DeepSkyBlue'
     expected_years_as_string = 31
     expected_months_as_string = 8
     expected_days_as_string = 8
@@ -84,7 +84,7 @@ describe 'API' do
   end
 
   it 'cannot get unexisting user' do
-    REDIS_CONNECTION.del(test_user.name)
+    User.delete(test_user.name)
     response = Response.new(app.call(request('GET', "/user/html/#{test_user.name}", '')))
 
     expect(response.code).to eq(404)
@@ -99,7 +99,7 @@ describe 'API' do
 
     expect(response.code).to eq(200)
     expect(response.body).to eq('User is updated!')
-    expect(REDIS_CONNECTION.exists(updated_user_params.name)).to eq(1)
+    expect(updated_user_params.exists?).to eq(true)
 
     old_user_updated = User.find(old_user.name)
 
@@ -108,9 +108,8 @@ describe 'API' do
   end
 
   it 'fails to update unexisting user' do
-    user_to_be_deleted = TestUser.create
-    REDIS_CONNECTION.del(user_to_be_deleted.name)
-    response = Response.new(app.call(request('POST', '/user/update', user_to_be_deleted.to_json)))
+    User.delete(test_user.name)
+    response = Response.new(app.call(request('POST', '/user/update', test_user.to_json)))
 
     expect(response.code).to eq(404)
     expect(response.body).to eq('User is not found')
@@ -133,7 +132,7 @@ describe 'API' do
 
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid gender. Must be Male, Female or Nonbinary')
-    expect(REDIS_CONNECTION.exists(old_user.name)).to eq(1)
+    expect(old_user.exists?).to eq(true)
     expect(User.find(old_user.name).gender).to eq(old_user.gender)
   end
 
@@ -143,16 +142,16 @@ describe 'API' do
 
     expect(response.code).to eq(204)
     expect(response.body).to eq('User is deleted')
-    expect(REDIS_CONNECTION.exists(user_to_be_deleted.name)).to eq(0)
+    expect(user_to_be_deleted.exists?).to eq(false)
   end
 
   it 'fails to delete unexisting user' do
-    REDIS_CONNECTION.del(test_user.name)
+    User.delete(test_user.name)
     response = Response.new(app.call(request('DELETE', "/user/#{test_user.name}", '')))
 
     expect(response.code).to eq(404)
     expect(response.body).to eq('User is not found')
-    expect(REDIS_CONNECTION.exists(test_user.name)).to eq(0)
+    expect(test_user.exists?).to eq(false)
   end
 
   it 'gets all users' do
@@ -162,6 +161,6 @@ describe 'API' do
     response = Response.new(app.call(request('GET', '/get_users', '')))
 
     expect(response.code).to eq(200)
-    expect(JSON.parse(response.body)).to match_array(REDIS_CONNECTION.keys('*'))
+    expect(JSON.parse(response.body)).to match_array(User.list)
   end
 end

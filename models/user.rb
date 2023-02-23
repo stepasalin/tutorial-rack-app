@@ -57,20 +57,20 @@ class User
     REDIS_CONNECTION.set(@name, to_json)
   end
 
-  def name_taken?
+  def exists?
     REDIS_CONNECTION.exists(@name) == 1
   end
 
   def create
     raise InvalidInputError unless valid?
-    raise DuplicatedUserError if name_taken?
+    raise DuplicatedUserError if exists?
 
     save
   end
 
   def overwrite
     raise InvalidInputError unless valid?
-    raise UserEntityIsNotFound unless name_taken?
+    raise UserEntityIsNotFound unless exists?
 
     save
   end
@@ -83,5 +83,9 @@ class User
 
   def self.list
     REDIS_CONNECTION.keys('*')
+  end
+
+  def self.delete_all
+    REDIS_CONNECTION.flushdb
   end
 end
