@@ -62,18 +62,25 @@ describe 'API' do
   end
 
   it 'gets user' do
-    user = TestUser.defined_age
+    age = 1_000_000_000
+    gender = :m
+    expected_background_color = 'blue'
+    expected_years_as_string = 31
+    expected_months_as_string = 8
+    expected_days_as_string = 8
+    user = TestUser.save age: age, gender: gender
+
     response = Response.new(app.call(request('GET', "/user/html/#{user.name}", '')))
     expect(response.code).to eq(200)
     expect(response.html?).to eq(true)
 
     response.parse_html_body
-    expect(response.background_color).to eq(page_color(user.gender))
+    expect(response.background_color).to eq(expected_background_color)
     expect(response.user_name).to eq(user.name)
 
-    expect(response.years).to eq(TestUser.years(user.age))
-    expect(response.months).to eq(TestUser.months(user.age))
-    expect(response.days).to eq(TestUser.days(user.age))
+    expect(response.years).to eq(expected_years_as_string)
+    expect(response.months).to eq(expected_months_as_string)
+    expect(response.days).to eq(expected_days_as_string)
   end
 
   it 'cannot get unexisting user' do
@@ -156,6 +163,5 @@ describe 'API' do
 
     expect(response.code).to eq(200)
     expect(JSON.parse(response.body)).to match_array(REDIS_CONNECTION.keys('*'))
-    expect(response.body.split(',').count).to eq(REDIS_CONNECTION.DBSIZE)
   end
 end
