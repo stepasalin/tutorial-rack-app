@@ -21,6 +21,13 @@ class UserController
     [409, {}, ['User is already created']]
   end
 
+  def user_json
+    name = @req.path.gsub('/users/', '').downcase
+    [200, {}, [User.find(name).to_json]]
+  rescue UserEntityIsNotFound
+    [404, {}, ['User is not found']]
+  end
+
   def user_html
     name = @req.path.gsub('/user/html/', '').downcase
     [200, {}, [UserView.new(User.find(name)).create_html]]

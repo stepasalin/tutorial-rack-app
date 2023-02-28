@@ -16,6 +16,8 @@ class Application
     controller = UserController.new(req)
     if req.post? && req.path.start_with?('/user/new')
       controller.create
+    elsif req.get? && req.path.start_with?('/users')
+      controller.user_json
     elsif req.get? && req.path.start_with?('/user/html/')
       controller.user_html
     elsif req.post? && req.path.start_with?('/user/update')
