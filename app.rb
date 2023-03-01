@@ -12,6 +12,7 @@ require_relative 'helpers/html_page'
 
 class Application
   def call(env)
+    sleep rand(3..5)
     req = Rack::Request.new(env)
     controller = UserController.new(req)
     if req.post? && req.path.start_with?('/user/new')
@@ -20,7 +21,7 @@ class Application
       controller.user_json
     elsif req.get? && req.path.start_with?('/user/html/')
       controller.user_html
-    elsif req.post? && req.path.start_with?('/user/update')
+    elsif req.put? && req.path.start_with?('/user/update')
       controller.update
     elsif req.delete? && req.path.start_with?('/user')
       controller.delete

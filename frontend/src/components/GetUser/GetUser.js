@@ -40,7 +40,7 @@ export default function GetUser() {
     setIsLoading(true);
     setUserOutdated(true);
     setErrorMessage('');  
-    fetch(`/raw_user/${inputValue}`)
+    fetch(`/users/${inputValue}`)
       .then((response) => handleResponse(response));
   };
   const userForm = (

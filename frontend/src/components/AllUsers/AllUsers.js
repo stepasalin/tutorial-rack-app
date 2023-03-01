@@ -33,7 +33,7 @@ export default function DeleteUser() {
   const handleClick = () => {
     setIsLoading(true);
     setErrorMessage('');
-    fetch('/all_user_names',
+    fetch('/get_users',
       {
         method: 'get'
       }
