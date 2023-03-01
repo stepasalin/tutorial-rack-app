@@ -12,7 +12,7 @@ require_relative 'helpers/html_page'
 
 class Application
   def call(env)
-    sleep rand(3..5)
+    sleep rand(1..3)
     req = Rack::Request.new(env)
     controller = UserController.new(req)
     if req.post? && req.path.start_with?('/user/new')
