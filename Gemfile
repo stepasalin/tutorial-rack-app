@@ -10,6 +10,8 @@ gem 'rackup', '~> 0.2.2'
 
 gem 'redis', '~> 4.7'
 
-gem 'rspec'
 gem 'capybara'
+gem 'rspec'
 gem 'selenium-webdriver'
+gem 'site_prism'
+gem 'webdrivers'

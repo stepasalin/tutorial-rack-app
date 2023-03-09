@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 require 'capybara/rspec'
 require 'capybara/dsl'
 require 'webdrivers/chromedriver'
+require 'site_prism'
 require_relative '../app'
 
 RSpec.configure do |config|
@@ -15,14 +18,14 @@ RSpec.configure do |config|
 
     options = Selenium::WebDriver::Chrome::Options.new.tap do |opts|
     end
-    
+
     Capybara.register_driver :chrome do |app|
       Capybara::Selenium::Driver.new(app, browser: :chrome, capabilities: [options])
     end
-    
+
     Capybara.default_driver = :chrome
     Capybara.default_max_wait_time = 30
-    
+
     Capybara.app = Rack::Builder.parse_file(File.expand_path('../config.ru', __dir__))
   end
 end

@@ -95,7 +95,7 @@ describe 'API' do
     old_user = TestUser.save gender: :m
     updated_user_params = TestUser.create name: old_user.name, gender: %w[f nb].sample,
                                           age: rand(1_000_000_000)
-    response = Response.new(app.call(request('POST', '/user/update', updated_user_params.to_json)))
+    response = Response.new(app.call(request('PUT', '/user/update', updated_user_params.to_json)))
 
     expect(response.code).to eq(200)
     expect(response.body).to eq('User is updated!')
@@ -109,7 +109,7 @@ describe 'API' do
 
   it 'fails to update unexisting user' do
     User.delete(test_user.name)
-    response = Response.new(app.call(request('POST', '/user/update', test_user.to_json)))
+    response = Response.new(app.call(request('PUT', '/user/update', test_user.to_json)))
 
     expect(response.code).to eq(404)
     expect(response.body).to eq('User is not found')
@@ -118,7 +118,7 @@ describe 'API' do
   it 'fails to update user with invalid age' do
     old_user = TestUser.save
     updated_user_params = TestUser.invalid_age name: old_user.name
-    response = Response.new(app.call(request('POST', '/user/update', updated_user_params.to_json)))
+    response = Response.new(app.call(request('PUT', '/user/update', updated_user_params.to_json)))
 
     expect(response.code).to eq(422)
     expect(response.body.strip).to eq('Invalid age. Must be integral number not less than 0.')
