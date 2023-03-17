@@ -16,7 +16,7 @@ class IndexPage < SitePrism::Page
 
   section :read_section, 'div#root > div:nth-of-type(1)' do
     element :name_input, '#id'
-    element :preloader, 'div.loading-spinner' 
+    element :preloader, 'div.loading-spinner'
     element :find_user_button, :button, 'Fetch User'
     element :success_message, '#root > div:nth-child(1) > div > ul'
     element :error_message, 'div.error'
@@ -36,4 +36,3 @@ class IndexPage < SitePrism::Page
     elements :users_list, 'ul li'
   end
 end
-

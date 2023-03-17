@@ -32,7 +32,7 @@ describe 'Base Page' do
 
   it 'fails to create user with invalid name' do
     invalid_name_user = TestUser.invalid_name
-    
+
     scenario.open_user_page
     scenario.input_user_info(invalid_name_user.name, invalid_name_user.age, invalid_name_user.gender)
     scenario.click_create_user_button
@@ -147,4 +147,4 @@ describe 'Base Page' do
   end
 end
 
-#found bug - age format is not converted
+# found bug - age format is not converted
